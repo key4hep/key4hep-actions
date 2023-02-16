@@ -6,7 +6,7 @@ runs:
     - name: Start container
       shell: bash
       run: |
-        docker run -it --name CI_container -v ${GITHUB_WORKSPACE}:/Package/main -v /cvmfs:/cvmfs:shared -d  centos:7 /bin/bash
+        docker run -it --name CI_container -v ${GITHUB_WORKSPACE}:/Package/main -v /cvmfs:/cvmfs:shared -d  jmcarcell/centos7 /bin/bash
 
     - shell: bash
       run: |
@@ -15,7 +15,6 @@ runs:
         name=$(echo "${{ github.event.repository.name }}" | tr '[:upper:]' '[:lower:]');\
         echo $name;\
 
-        yum install -y glibc-devel git;\
         git clone https://github.com/spack/spack --depth 1;\
         source spack/share/spack/setup-env.sh;\
         git clone https://github.com/key4hep/key4hep-spack --depth 1;\
@@ -23,13 +22,11 @@ runs:
         spack repo add .;\
         cd ..;\
         git clone https://github.com/key4hep/key4hep-dev-utils --depth 1;\
-        python3 /Package/key4hep-dev-utils/scripts/externals.py;\
         branch_packages=$(python3 /Package/key4hep-dev-utils/scripts/parse.py "${{ github.event.pull_request.body }}");\
-        # branch_packages=""
-        echo "branche_packages = $branch_packages";\
+        echo "branch_packages = $branch_packages";\
         spack env create dev;\
         spack env activate dev;\
-        python3 /Package/key4hep-dev-utils/scripts/config.py;\
+        python3 /Package/key4hep-dev-utils/scripts/externals.py;\
         python3 /Package/key4hep-dev-utils/scripts/fetch_and_checkout.py $name "$branch_packages";\
         cd main;\
         spack develop --no-clone --path $PWD $name@master;\
