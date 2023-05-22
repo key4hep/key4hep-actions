@@ -32,7 +32,7 @@ runs:
         spack env activate environments/key4hep-nightly
         cd ..;\
 
-        name=$(echo "${{ github.event.repository.name }}" | tr '[:upper:]' '[:lower:]');\
+        name=$(echo "${{ github.event.repository.name }}" | tr "[:upper:]" "[:lower:]");\
         echo $name;\
 
         git clone https://github.com/key4hep/key4hep-dev-utils --depth 1;\
@@ -42,7 +42,7 @@ runs:
         spack config add "upstreams:nightly:install_tree: $rel";\
         python3 /Package/key4hep-dev-utils/scripts/fetch_and_checkout.py $name "$branch_packages";\
         cd main;\
-        default_branch=$(git remote show origin | grep 'HEAD branch' | cut -d' ' -f5-);\
+        default_branch=$(git remote show origin | grep "HEAD branch" | cut -d" " -f5-);\
         python3 /Package/key4hep-dev-utils/scripts/add_versions_to_spec.py $name key4hep-spack/environments/key4hep-nightly/spack.yaml $rel $default_branch;\
         spack develop --no-clone --path $PWD $name@$default_branch;\
         spack concretize -f;\
