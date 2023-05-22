@@ -16,7 +16,7 @@ runs:
         # set up spack and key4hep-spack to match the commits
         # used for building so that none of the packages of the build are rebuilt
         source /cvmfs/sw-nightlies.hsf.org/key4hep/setup.sh;\
-        rel=$(find /cvmfs/sw-nightlies.hsf.org/key4hep/releases/ -maxdepth 3 -type f -wholename "*/.scratch" | sort -r | head -1);\
+        rel=$(find /cvmfs/sw-nightlies.hsf.org/key4hep/releases/ -maxdepth 3 -type f -wholename "*centos7*/.scratch" | sort -r | head -1);\
         rel=$(dirname $rel);\
         echo "rel is $rel";\
 
@@ -38,7 +38,7 @@ runs:
         git clone https://github.com/key4hep/key4hep-dev-utils --depth 1;\
         branch_packages=$(python3 /Package/key4hep-dev-utils/scripts/parse.py "${{ github.event.pull_request.body }}");\
         echo "branch_packages = $branch_packages";\
-        spack repo add key4hep-spack;\
+        # spack repo add key4hep-spack;\
         spack config add "upstreams:nightly:install_tree: $rel";\
         python3 /Package/key4hep-dev-utils/scripts/fetch_and_checkout.py $name "$branch_packages";\
         cd main;\
