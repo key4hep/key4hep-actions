@@ -42,7 +42,7 @@ runs:
         spack config add "upstreams:nightly:install_tree: $rel";\
         python3 /Package/key4hep-dev-utils/scripts/fetch_and_checkout.py $name "$branch_packages";\
         cd main;\
-        default_branch="${{ github.ref }}"
+        default_branch="${{ github.base_ref }}"
         echo default_branch is $default_branch
         python3 /Package/key4hep-dev-utils/scripts/add_versions_to_spec.py $name key4hep-spack/environments/key4hep-nightly/spack.yaml $rel $default_branch;\
         spack develop --no-clone --path $PWD $name@$default_branch;\
