@@ -24,6 +24,9 @@ runs:
         cd spack;\
         git checkout $(cat $rel/.spack-commit);\
         cd ..;\
+
+        source $rel/.cherry-pick
+
         source spack/share/spack/setup-env.sh;\
 
         git clone https://github.com/key4hep/key4hep-spack --single-branch;\
