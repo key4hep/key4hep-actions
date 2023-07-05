@@ -43,6 +43,10 @@ runs:
         echo "branch_packages = $branch_packages";\
         # spack repo add key4hep-spack;\
         spack config add "upstreams:nightly:install_tree: $rel";\
+        latest_rel=$(find /cvmfs/sw-nightlies.hsf.org/key4hep/releases/ -maxdepth 3 -type f -wholename "*centos7*/.spack-commit" | sort -r | head -1);\
+        if [ "rel" != "latest_rel" ]; do;\
+          spack config add "upstreams:nightly_latest:install_tree: $latest_rel";\
+        fi;\
         python3 /Package/key4hep-dev-utils/scripts/fetch_and_checkout.py $name "$branch_packages";\
         cd main;\
         default_branch="${{ github.base_ref }}"
