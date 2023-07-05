@@ -16,7 +16,7 @@ runs:
         # set up spack and key4hep-spack to match the commits
         # used for building so that none of the packages of the build are rebuilt
         source /cvmfs/sw-nightlies.hsf.org/key4hep/setup.sh;\
-        rel=$(find /cvmfs/sw-nightlies.hsf.org/key4hep/releases/ -maxdepth 3 -type f -wholename "*centos7*/.spack-commit" | sort -r | head -1);\
+        rel=$(find /cvmfs/sw-nightlies.hsf.org/key4hep/releases/ -maxdepth 3 -type f -wholename "*centos7*/.scratch" | sort -r | head -1);\
         rel=$(dirname $rel);\
         echo "rel is $rel";\
 
