@@ -10,47 +10,51 @@ runs:
 
     - shell: bash
       run: |
-        docker exec CI_container /bin/bash -c 'cd ./Package; \
+        cat <<EOF> script.sh
+        cd ./Package
 
-        # Set up cvmfs to get git, python, etc and then; \
-        # set up spack and key4hep-spack to match the commits; \
-        # used for building so that none of the packages of the build are rebuilt; \
-        source /cvmfs/sw-nightlies.hsf.org/key4hep/setup.sh; \
-        rel=$(find /cvmfs/sw-nightlies.hsf.org/key4hep/releases/ -maxdepth 3 -type f -wholename "*centos7*/.scratch" | sort -r | head -1); \
-        rel=$(dirname $rel); \
-        echo "rel is $rel"; \
+        # Set up cvmfs to get git, python, etc and then
+        # set up spack and key4hep-spack to match the commits
+        # used for building so that none of the packages of the build are rebuilt
+        source /cvmfs/sw-nightlies.hsf.org/key4hep/setup.sh
+        rel=$(find /cvmfs/sw-nightlies.hsf.org/key4hep/releases/ -maxdepth 3 -type f -wholename "*centos7*/.scratch" | sort -r | head -1)
+        rel=$(dirname $rel)
+        echo "rel is $rel"
 
-        git clone https://github.com/spack/spack --single-branch; \
-        cd spack; \
-        git checkout $(cat $rel/.spack-commit); \
-        source $rel/.cherry-pick; \
-        cd ..; \
+        git clone https://github.com/spack/spack --single-branch
+        cd spack
+        git checkout $(cat $rel/.spack-commit)
+        source $rel/.cherry-pick
+        cd ..
 
-        source spack/share/spack/setup-env.sh; \
+        source spack/share/spack/setup-env.sh
 
-        git clone https://github.com/key4hep/key4hep-spack --single-branch; \
-        cd key4hep-spack; \
-        git checkout $(cat $rel/.key4hep-spack-commit); \
-        spack env activate environments/key4hep-nightly; \
-        cd ..; \
+        git clone https://github.com/key4hep/key4hep-spack --single-branch
+        cd key4hep-spack
+        git checkout $(cat $rel/.key4hep-spack-commit)
+        spack env activate environments/key4hep-nightly
+        cd ..
 
-        name=$(echo "${{ github.event.repository.name }}" | tr "[:upper:]" "[:lower:]"); \
-        echo $name; \
+        name=$(echo "${{ github.event.repository.name }}" | tr "[:upper:]" "[:lower:]")
+        echo $name
 
-        git clone https://github.com/key4hep/key4hep-dev-utils --depth 1; \
-        echo "branch_packages = $branch_packages"; \
-        latest_rel=$(find /cvmfs/sw-nightlies.hsf.org/key4hep/releases/ -maxdepth 3 -type f -wholename "*centos7*/.spack-commit" | sort -r | head -1); \
-        latest_rel=$(dirname $latest_rel); \
+        git clone https://github.com/key4hep/key4hep-dev-utils --depth 1
+        branch_packages=$(python3 /Package/key4hep-dev-utils/scripts/parse.py " ${{ github.event.pull_request.body }} " ) 
+        echo "branch_packages = $branch_packages"
+        latest_rel=$(find /cvmfs/sw-nightlies.hsf.org/key4hep/releases/ -maxdepth 3 -type f -wholename "*centos7*/.spack-commit" | sort -r | head -1)
+        latest_rel=$(dirname $latest_rel)
         if [ "$rel" != "$latest_rel" ]; then \
-          spack config add "upstreams:nightly_latest:install_tree: $latest_rel"; \
-        fi; \
-        spack config add "upstreams:nightly:install_tree: $rel"; \
-        python3 /Package/key4hep-dev-utils/scripts/fetch_and_checkout.py $name "$branch_packages"; \
-        cd main; \
-        default_branch="${{ github.base_ref }}"; \
-        echo default_branch is $default_branch; \
-        python3 /Package/key4hep-dev-utils/scripts/add_versions_to_spec.py $name /Package/key4hep-spack/environments/key4hep-nightly/spack.yaml $default_branch $rel $latest_rel; \
-        cat /Package/key4hep-spack/environments/key4hep-nightly/spack.yaml; \
-        spack develop --no-clone --path $PWD $name@$default_branch; \
-        spack concretize -f; \
-        spack install'
+          spack config add "upstreams:nightly_latest:install_tree: $latest_rel"
+        fi
+        spack config add "upstreams:nightly:install_tree: $rel"
+        python3 /Package/key4hep-dev-utils/scripts/fetch_and_checkout.py $name "$branch_packages"
+        cd main
+        default_branch="${{ github.base_ref }}"
+        echo default_branch is $default_branch
+        python3 /Package/key4hep-dev-utils/scripts/add_versions_to_spec.py $name /Package/key4hep-spack/environments/key4hep-nightly/spack.yaml $default_branch $rel $latest_rel
+        cat /Package/key4hep-spack/environments/key4hep-nightly/spack.yaml
+        spack develop --no-clone --path $PWD $name@$default_branch
+        spack concretize -f
+        spack install
+        EOF
+        docker exec CI_container /bin/bash script.sh
