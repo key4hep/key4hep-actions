@@ -55,5 +55,4 @@ runs:
         cat /Package/key4hep-spack/environments/key4hep-nightly/spack.yaml; \
         spack develop --no-clone --path $PWD $name@$default_branch; \
         spack concretize -f; \
-        spack install; \
-        '
+        spack install'
