@@ -43,7 +43,7 @@ runs:
         # spack repo add key4hep-spack;\
         latest_rel=$(find /cvmfs/sw-nightlies.hsf.org/key4hep/releases/ -maxdepth 3 -type f -wholename "*centos7*/.spack-commit" | sort -r | head -1);\
         latest_rel=$(dirname $latest_rel);\
-        if [ "rel" != "latest_rel" ]; then;\
+        if [ "$rel" != "$latest_rel" ]; then;\
           spack config add "upstreams:nightly_latest:install_tree: $latest_rel";\
         fi;\
         spack config add "upstreams:nightly:install_tree: $rel";\
