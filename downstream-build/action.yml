@@ -56,5 +56,9 @@ runs:
         spack develop --no-clone --path $PWD $name@$default_branch
         spack concretize -f
         spack install
+
         EOF
+
+        cat /script.sh
+
         docker exec CI_container /bin/bash /script.sh
