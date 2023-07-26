@@ -10,6 +10,8 @@ runs:
 
     - shell: bash
       run: |
+        echo $PWD
+        ls -lah
         cat <<'EOF' > /Package/script_container.sh
         cd ./Package
 
