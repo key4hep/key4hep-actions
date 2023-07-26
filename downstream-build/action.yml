@@ -10,7 +10,7 @@ runs:
 
     - shell: bash
       run: |
-        cat <<'EOF'> /script.sh
+        cat <<'EOF'> /Package/script_container.sh
         cd ./Package
 
         # Set up cvmfs to get git, python, etc and then
@@ -59,6 +59,6 @@ runs:
 
         EOF
 
-        cat /script.sh
+        cat /Package/script_container.sh
 
-        docker exec CI_container /bin/bash /script.sh
+        docker exec CI_container /bin/bash /Package/script_container.sh
