@@ -12,7 +12,7 @@ runs:
       run: |
         echo $PWD
         ls -lah
-        cat <<'EOF' > script_container.sh
+        cat <<'EOF' > ${GITHUB_WORKSPACE}/script_container.sh
         cd ./Package
 
         # Set up cvmfs to get git, python, etc and then
@@ -61,6 +61,6 @@ runs:
 
         EOF
 
-        cat script_container.sh
+        cat ${GITHUB_WORKSPACE}/script_container.sh
 
-        docker exec CI_container /bin/bash script_container.sh
+        docker exec CI_container /bin/bash /Package/main/script_container.sh
