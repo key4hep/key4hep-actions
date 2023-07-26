@@ -10,7 +10,7 @@ runs:
 
     - shell: bash
       run: |
-        cat <<'EOF'> /Package/script_container.sh
+        cat <<'EOF' > /Package/script_container.sh
         cd ./Package
 
         # Set up cvmfs to get git, python, etc and then
