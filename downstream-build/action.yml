@@ -6,7 +6,7 @@ runs:
     - name: Start container
       shell: bash
       run: |
-        docker run -it --name CI_container -v ${GITHUB_WORKSPACE}:/Package/main -v /cvmfs:/cvmfs:shared -d ghcr.io/key4hep/key4hep-images/centos7:latest /bin/bash
+        docker run -it --name CI_container -v ${GITHUB_WORKSPACE}:/Package/main -v /cvmfs:/cvmfs:shared -d ghcr.io/key4hep/key4hep-images/alma9:latest /bin/bash
 
     - shell: bash
       run: |
@@ -19,7 +19,7 @@ runs:
         # set up spack and key4hep-spack to match the commits
         # used for building so that none of the packages of the build are rebuilt
         source /cvmfs/sw-nightlies.hsf.org/key4hep/setup.sh
-        rel=$(find /cvmfs/sw-nightlies.hsf.org/key4hep/releases/ -maxdepth 3 -type f -wholename "*centos7*/.scratch" | sort -r | head -1)
+        rel=$(find /cvmfs/sw-nightlies.hsf.org/key4hep/releases/ -maxdepth 3 -type f -wholename "*almalinux9*/.scratch" | sort -r | head -1)
         rel=$(dirname $rel)
         echo "rel is $rel"
 
@@ -43,21 +43,29 @@ runs:
         git clone https://github.com/key4hep/key4hep-dev-utils --depth 1
         branch_packages=$(python3 /Package/key4hep-dev-utils/scripts/parse.py " ${{ github.event.pull_request.body }} " ) 
         echo "branch_packages = $branch_packages"
-        latest_rel=$(find /cvmfs/sw-nightlies.hsf.org/key4hep/releases/ -maxdepth 3 -type f -wholename "*centos7*/.spack-commit" | sort -r | head -1)
+        latest_rel=$(find /cvmfs/sw-nightlies.hsf.org/key4hep/releases/ -maxdepth 3 -type f -wholename "*almalinux9*/.spack-commit" | sort -r | head -1)
         latest_rel=$(dirname $latest_rel)
         if [ "$rel" != "$latest_rel" ]; then \
           spack config add "upstreams:nightly_latest:install_tree: $latest_rel"
         fi
         spack config add "upstreams:nightly:install_tree: $rel"
+        mkdir /Workarea
+        cd /Workarea
         python3 /Package/key4hep-dev-utils/scripts/fetch_and_checkout.py $name "$branch_packages"
-        cd main
-        default_branch="${{ github.base_ref }}"
-        echo default_branch is $default_branch
-        python3 /Package/key4hep-dev-utils/scripts/add_versions_to_spec.py $name /Package/key4hep-spack/environments/key4hep-nightly/spack.yaml $default_branch $rel $latest_rel
-        cat /Package/key4hep-spack/environments/key4hep-nightly/spack.yaml
-        spack develop --no-clone --path $PWD $name@$default_branch
-        spack concretize -f
-        spack install
+
+        for package in $(ls)
+        do
+            cd package
+            mkdir build
+            cd build
+            cmake .. -G Ninja
+            ninja install
+            ctest -j $(nproc)
+            cd ../..
+        done
+        # cd main
+        # default_branch="${{ github.base_ref }}"
+        # echo default_branch is $default_branch
 
         EOF
 
