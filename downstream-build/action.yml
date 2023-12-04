@@ -62,7 +62,7 @@ runs:
         cmake .. -DCMAKE_INSTALL_PREFIX=../install -G Ninja
         ninja install
         # Do not run the tests, this is already done in other CI workflows
-        # ctest -j $(nproc)
+        ctest -j $(nproc) --output-on-failure
         cd ../install
         export PATH=$PWD/bin:$PATH
         export LD_LIBRARY_PATH=$PWD/lib:$PWD/lib64:$LD_LIBRARY_PATH
@@ -78,7 +78,7 @@ runs:
             cd build
             cmake .. -DCMAKE_INSTALL_PREFIX=../install -G Ninja
             ninja install
-            ctest -j $(nproc)
+            ctest -j $(nproc) --output-on-failure
             cd ../install
             export PATH=$PWD/bin:$PATH
             export LD_LIBRARY_PATH=$PWD/lib:$PWD/lib64:$LD_LIBRARY_PATH
