@@ -56,6 +56,17 @@ runs:
         # Exit now if there is any command that fails
         set -e
 
+        for package in $(ls)
+        do
+            paths="/${package:3}/|$paths"
+        done
+        paths="$paths/$name/"
+
+        for v in PATH LD_LIBRARY_PATH PYTHONPATH ROOT_INCLUDE_PATH CMAKE_PREFIX_PATH
+        do
+            export $v=$(eval echo \$$v | tr ":" "\n" | grep -Ev "{paths}" | tr "\n" ":")
+        done
+
         cd /Package/main
         mkdir build
         cd build
