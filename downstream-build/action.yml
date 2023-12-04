@@ -61,6 +61,7 @@ runs:
         cd build
         cmake .. -DCMAKE_INSTALL_PREFIX=../install -G Ninja
         ninja install
+        # Do not run the tests, this is already done in other CI workflows
         ctest -j $(nproc)
         cd ../install
         export PATH=$PWD/bin:$PATH
