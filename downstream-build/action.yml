@@ -65,6 +65,7 @@ runs:
         for v in PATH LD_LIBRARY_PATH PYTHONPATH ROOT_INCLUDE_PATH CMAKE_PREFIX_PATH
         do
             export $v=$(eval echo \$$v | tr ":" "\n" | grep -Ev "{paths}" | tr "\n" ":")
+            echo $v is ${!v}
         done
 
         cd /Package/main
