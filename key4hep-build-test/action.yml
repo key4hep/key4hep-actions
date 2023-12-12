@@ -15,7 +15,7 @@ jobs:
     strategy:
         fail-fast: false
         matrix:
-        release: ["sw.hsf.org/key4hep",
+          release: ["sw.hsf.org/key4hep",
                     "sw-nightlies.hsf.org/key4hep"]
 
     steps:
@@ -42,7 +42,7 @@ jobs:
     strategy:
         fail-fast: false
         matrix:
-        release: ["sw.hsf.org/key4hep",
+          release: ["sw.hsf.org/key4hep",
                     "sw-nightlies.hsf.org/key4hep"]
 
     steps:
@@ -70,7 +70,7 @@ jobs:
     strategy:
         fail-fast: false
         matrix:
-        release: ["sw.hsf.org/key4hep",
+          release: ["sw.hsf.org/key4hep",
                     "sw-nightlies.hsf.org/key4hep"]
 
     steps:
