@@ -1,4 +1,5 @@
 name: Key4hep build
+description: Build and test using the Key4hep stack
 
 on:
   push:
@@ -6,83 +7,84 @@ on:
       - main
   workflow_dispatch:
 
-jobs:
-  job1:
-    runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/key4hep-images/alma9-build:latest
-
-    strategy:
-        fail-fast: false
-        matrix:
-          release: ["sw.hsf.org/key4hep",
-                    "sw-nightlies.hsf.org/key4hep"]
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Set up CVMFS
-        uses: cvmfs-contrib/github-action-cvmfs@v3
-
-      - name: Setup environment and build
-        run: |
-            mkdir build
-            cd build
-            cmake .. -DCMAKE_CXX_STANDARD=17 -DCMAKE_INSTALL_PREFIX=../install -G Ninja
-            ninja install
-            ctest -j $(nproc) --output-on-failure
-
-  job2:
-    runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/key4hep-images/ubuntu22-build:latest
-
-    strategy:
-        fail-fast: false
-        matrix:
-          release: ["sw.hsf.org/key4hep",
-                    "sw-nightlies.hsf.org/key4hep"]
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Set up CVMFS
-        uses: cvmfs-contrib/github-action-cvmfs@v3
-
-      - name: Setup environment and build
-        run: |
-            mkdir build
-            cd build
-            cmake .. -DCMAKE_CXX_STANDARD=17 -DCMAKE_INSTALL_PREFIX=../install -G Ninja
-            ninja install
-            ctest -j $(nproc) --output-on-failure
-
-
-  job3:
-    runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/key4hep-images/centos7-build:latest
-
-    strategy:
-        fail-fast: false
-        matrix:
-          release: ["sw.hsf.org/key4hep",
-                    "sw-nightlies.hsf.org/key4hep"]
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Set up CVMFS
-        uses: cvmfs-contrib/github-action-cvmfs@v3
-
-      - name: Setup environment and build
-        run: |
-            mkdir build
-            cd build
-            cmake .. -DCMAKE_CXX_STANDARD=17 -DCMAKE_INSTALL_PREFIX=../install -G Ninja
-            ninja install
-            ctest -j $(nproc) --output-on-failure
+runs:
+  jobs:
+    job1:
+      runs-on: ubuntu-latest
+      container:
+        image: ghcr.io/key4hep-images/alma9-build:latest
+  
+      strategy:
+          fail-fast: false
+          matrix:
+            release: ["sw.hsf.org/key4hep",
+                      "sw-nightlies.hsf.org/key4hep"]
+  
+      steps:
+        - name: Checkout repository
+          uses: actions/checkout@v3
+  
+        - name: Set up CVMFS
+          uses: cvmfs-contrib/github-action-cvmfs@v3
+  
+        - name: Setup environment and build
+          run: |
+              mkdir build
+              cd build
+              cmake .. -DCMAKE_CXX_STANDARD=17 -DCMAKE_INSTALL_PREFIX=../install -G Ninja
+              ninja install
+              ctest -j $(nproc) --output-on-failure
+  
+    job2:
+      runs-on: ubuntu-latest
+      container:
+        image: ghcr.io/key4hep-images/ubuntu22-build:latest
+  
+      strategy:
+          fail-fast: false
+          matrix:
+            release: ["sw.hsf.org/key4hep",
+                      "sw-nightlies.hsf.org/key4hep"]
+  
+      steps:
+        - name: Checkout repository
+          uses: actions/checkout@v3
+  
+        - name: Set up CVMFS
+          uses: cvmfs-contrib/github-action-cvmfs@v3
+  
+        - name: Setup environment and build
+          run: |
+              mkdir build
+              cd build
+              cmake .. -DCMAKE_CXX_STANDARD=17 -DCMAKE_INSTALL_PREFIX=../install -G Ninja
+              ninja install
+              ctest -j $(nproc) --output-on-failure
+  
+  
+    job3:
+      runs-on: ubuntu-latest
+      container:
+        image: ghcr.io/key4hep-images/centos7-build:latest
+  
+      strategy:
+          fail-fast: false
+          matrix:
+            release: ["sw.hsf.org/key4hep",
+                      "sw-nightlies.hsf.org/key4hep"]
+  
+      steps:
+        - name: Checkout repository
+          uses: actions/checkout@v3
+  
+        - name: Set up CVMFS
+          uses: cvmfs-contrib/github-action-cvmfs@v3
+  
+        - name: Setup environment and build
+          run: |
+              mkdir build
+              cd build
+              cmake .. -DCMAKE_CXX_STANDARD=17 -DCMAKE_INSTALL_PREFIX=../install -G Ninja
+              ninja install
+              ctest -j $(nproc) --output-on-failure
 
