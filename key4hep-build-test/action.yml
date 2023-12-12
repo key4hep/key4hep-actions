@@ -18,8 +18,6 @@ jobs:
         release: ["sw.hsf.org/key4hep",
                     "sw-nightlies.hsf.org/key4hep"]
 
-    <<: *build_strategy
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -40,8 +38,6 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/key4hep-images/ubuntu22-build:latest
-
-    <<: *build_strategy
 
     strategy:
         fail-fast: false
@@ -70,8 +66,6 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/key4hep-images/centos7-build:latest
-
-    <<: *build_strategy
 
     strategy:
         fail-fast: false
