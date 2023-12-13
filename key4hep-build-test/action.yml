@@ -7,8 +7,7 @@ runs:
     - name: Start container
       shell: bash
       run: |
-        docker pull ghcr.io/key4hep/key4hep-images/alma9-cvmfs:latest
-        docker run -it --name CI_container --device /dev/fuse -v ${GITHUB_WORKSPACE}:/Package/main -d ghcr.io/key4hep/key4hep-images/alma9-cvmfs:latest /bin/bash
+        docker run -it --name CI_container -v ${GITHUB_WORKSPACE}:/Package/main -d ghcr.io/key4hep/key4hep-images/alma9-cvmfs:latest /bin/bash
 
     - name: Setup environment and build
       shell: bash
