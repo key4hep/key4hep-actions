@@ -9,7 +9,6 @@ runs:
       run: |
         docker run -it --name CI_container --device /dev/fuse -v ${GITHUB_WORKSPACE}:/Package/main -d ghcr.io/key4hep/key4hep-images/alma9-cvmfs:latest /bin/bash
 
-  steps:
     - name: Setup environment and build
       run: |
           /mount.sh
