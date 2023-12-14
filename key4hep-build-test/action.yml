@@ -12,6 +12,7 @@ runs:
     - name: Setup environment and build
       shell: bash
       run: |
+          cat <<'EOF' > ${GITHUB_WORKSPACE}/script_container.sh
           ls -lah /
           /mount.sh
           cd /Package
@@ -21,3 +22,8 @@ runs:
           ninja install
           ctest -j $(nproc) --output-on-failure
 
+          EOF
+
+          cat ${GITHUB_WORKSPACE}/script_container.sh
+
+          docker exec CI_container /bin/bash /Package/main/script_container.sh
