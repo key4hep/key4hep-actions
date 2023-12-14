@@ -53,8 +53,6 @@ runs:
           export CPATH=$(echo $CPATH | tr ':' '\n' | grep -v "/$name/" | tr '\n' ':')
           export PYTHONPATH=$(echo $PYTHONPATH | tr ':' '\n' | grep -v "/$name/" | tr '\n' ':')
 
-          echo $LD_LIBRARY_PATH
-
           cmake .. -DCMAKE_CXX_STANDARD=17 -DCMAKE_INSTALL_PREFIX=../install -G Ninja
           ninja install
           ctest -j $(nproc) --output-on-failure
