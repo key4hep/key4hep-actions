@@ -5,11 +5,15 @@ on:
   workflow_dispatch:
 
 jobs:
-  test:
+  build:
+    strategy:
+      matrix:
+        build_type: ["release", "nightly"]
+        image: ["alma9", "ubuntu22", "centos7"]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
     - uses: key4hep/key4hep-actions/key4hep-build-test@main
       with:
-        build_type: release
-        image: alma9
+        build_type: ${{ matrix.build_type }}
+        image: ${{ matrix.image }}

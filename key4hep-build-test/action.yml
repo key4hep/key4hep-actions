@@ -15,7 +15,16 @@ runs:
     - name: Start container
       shell: bash
       run: |
-        docker run -it --name container --privileged -v ${GITHUB_WORKSPACE}:/Package -d ghcr.io/key4hep/key4hep-images/alma9-cvmfs:latest /bin/bash
+        if [ "${{ inputs.image }}" = "alma9" ]; then
+          docker run -it --name container --privileged -v ${GITHUB_WORKSPACE}:/Package -d ghcr.io/key4hep/key4hep-images/alma9-cvmfs:latest /bin/bash
+        elif [ "${{ inputs.image }}" = "ubuntu22" ]; then
+          docker run -it --name container --privileged -v ${GITHUB_WORKSPACE}:/Package -d ghcr.io/key4hep/key4hep-images/ubuntu22-cvmfs:latest /bin/bash
+        elif [ "${{ inputs.image }}" = "centos7" ]; then
+          docker run -it --name container --privileged -v ${GITHUB_WORKSPACE}:/Package -d ghcr.io/key4hep/key4hep-images/centos7-cvmfs:latest /bin/bash
+        else
+          echo "Unknown image"
+          exit 1
+        fi
 
     - name: Setup environment and build
       shell: bash
