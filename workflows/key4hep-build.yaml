@@ -10,6 +10,7 @@ jobs:
       matrix:
         build_type: ["release", "nightly"]
         image: ["alma9", "ubuntu22", "centos7"]
+      fail-fast: false
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
