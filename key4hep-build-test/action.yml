@@ -16,7 +16,7 @@ runs:
       shell: bash
       run: |
         if [ "${{ inputs.image }}" = "alma9" ]; then
-          docker run --name container --privileged -v ${GITHUB_WORKSPACE}:/Package -d ghcr.io/key4hep/key4hep-images/alma9-cvmfs /bin/bash
+          docker run --name container --privileged -v ${GITHUB_WORKSPACE}:/Package -d ghcr.io/key4hep/key4hep-images/alma9-cvmfs tail -f /dev/null
         elif [ "${{ inputs.image }}" = "ubuntu22" ]; then
           docker run --name container --privileged -v ${GITHUB_WORKSPACE}:/Package -d ghcr.io/key4hep/key4hep-images/ubuntu22-cvmfs /bin/bash
         elif [ "${{ inputs.image }}" = "centos7" ]; then
