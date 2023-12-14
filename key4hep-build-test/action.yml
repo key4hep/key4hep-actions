@@ -42,4 +42,4 @@ runs:
 
           cat ${GITHUB_WORKSPACE}/script_container.sh
 
-          docker exec container /bin/bash ${GITHUB_WORKSPACE}/script_container.sh
+          docker exec container /bin/bash /Package/script_container.sh
