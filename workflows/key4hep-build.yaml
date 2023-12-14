@@ -9,7 +9,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - uses: cvmfs-contrib/github-action-cvmfs@v3
     - uses: key4hep/key4hep-actions/key4hep-build-test@main
       with:
         build_type: release
