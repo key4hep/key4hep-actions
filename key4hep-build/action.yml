@@ -47,11 +47,11 @@ runs:
           cd build
 
           name=$(echo "${{ github.event.repository.name }}" | tr '[:upper:]' '[:lower:]')
-          export PATH=$(echo $PATH | tr ':' '\n' | grep -v '/$name/' | tr '\n' ':')
-          export LD_LIBRARY_PATH=$(echo $LD_LIBRARY_PATH | tr ':' '\n' | grep -v '/$name/' | tr '\n' ':')
-          export ROOT_INCLUDE_PATH=$(echo $ROOT_INCLUDE_PATH | tr ':' '\n' | grep -v '/$name/' | tr '\n' ':')
-          export CPATH=$(echo $CPATH | tr ':' '\n' | grep -v '/$name/' | tr '\n' ':')
-          export PYTHONPATH=$(echo $PYTHONPATH | tr ':' '\n' | grep -v '/$name/' | tr '\n' ':')
+          export PATH=$(echo $PATH | tr ':' '\n' | grep -v "/$name/" | tr '\n' ':')
+          export LD_LIBRARY_PATH=$(echo $LD_LIBRARY_PATH | tr ':' '\n' | grep -v "/$name/" | tr '\n' ':')
+          export ROOT_INCLUDE_PATH=$(echo $ROOT_INCLUDE_PATH | tr ':' '\n' | grep -v "/$name/" | tr '\n' ':')
+          export CPATH=$(echo $CPATH | tr ':' '\n' | grep -v "/$name/" | tr '\n' ':')
+          export PYTHONPATH=$(echo $PYTHONPATH | tr ':' '\n' | grep -v "/$name/" | tr '\n' ':')
 
           echo $LD_LIBRARY_PATH
 
