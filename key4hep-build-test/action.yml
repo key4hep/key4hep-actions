@@ -7,11 +7,12 @@ runs:
     - name: Start container
       shell: bash
       run: |
-        docker run -it --name CI_container -v ${GITHUB_WORKSPACE}:/Package/main -d ghcr.io/key4hep/key4hep-images/alma9-cvmfs:latest /bin/bash
+        docker run -it --name CI_container --device /dev/fuse --cap-add SYS_ADMIN -v ${GITHUB_WORKSPACE}:/Package/main -d ghcr.io/key4hep/key4hep-images/alma9-cvmfs:latest /bin/bash
 
     - name: Setup environment and build
       shell: bash
       run: |
+          ls -lah /
           /mount.sh
           cd /Package
           mkdir build
