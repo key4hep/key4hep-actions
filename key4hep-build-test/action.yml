@@ -3,10 +3,10 @@ description: Build and test using the Key4hep stack
 
 inputs:
   build_type:
-    description: "release" or "nightly"
+    description: release or nightly
     required: true
   image:
-    description: "alma9", "ubuntu22" or "centos7"
+    description: alma9, ubuntu22 or centos7
     required: true
 
 runs:
