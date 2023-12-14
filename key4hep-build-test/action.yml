@@ -16,11 +16,11 @@ runs:
       shell: bash
       run: |
         if [ "${{ inputs.image }}" = "alma9" ]; then
-          docker run -it --name container --privileged -v ${GITHUB_WORKSPACE}:/Package -d ghcr.io/key4hep/key4hep-images/alma9-cvmfs /bin/bash
+          docker run --name container --privileged -v ${GITHUB_WORKSPACE}:/Package -d ghcr.io/key4hep/key4hep-images/alma9-cvmfs /bin/bash
         elif [ "${{ inputs.image }}" = "ubuntu22" ]; then
-          docker run -it --name container --privileged -v ${GITHUB_WORKSPACE}:/Package -d ghcr.io/key4hep/key4hep-images/ubuntu22-cvmfs /bin/bash
+          docker run --name container --privileged -v ${GITHUB_WORKSPACE}:/Package -d ghcr.io/key4hep/key4hep-images/ubuntu22-cvmfs /bin/bash
         elif [ "${{ inputs.image }}" = "centos7" ]; then
-          docker run -it --name container --privileged -v ${GITHUB_WORKSPACE}:/Package -d ghcr.io/key4hep/key4hep-images/centos7-cvmfs /bin/bash
+          docker run --name container --privileged -v ${GITHUB_WORKSPACE}:/Package -d ghcr.io/key4hep/key4hep-images/centos7-cvmfs /bin/bash
         else
           echo "Unknown image"
           exit 1
