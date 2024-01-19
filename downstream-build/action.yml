@@ -71,7 +71,7 @@ runs:
         cd /Package/main
         mkdir build
         cd build
-        cmake .. -DCMAKE_INSTALL_PREFIX=../install -G Ninja
+        cmake .. -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_CXX_STANDARD=20 -G Ninja
         ninja install
         # Do not run the tests, this is already done in other CI workflows
         # ctest -j $(nproc) --output-on-failure
@@ -88,7 +88,7 @@ runs:
             cd $package
             mkdir build
             cd build
-            cmake .. -DCMAKE_INSTALL_PREFIX=../install -G Ninja
+            cmake .. -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_CXX_STANDARD=20 -G Ninja
             ninja install
             ctest -j $(nproc) --output-on-failure
             cd ../install
