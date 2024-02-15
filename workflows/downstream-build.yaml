@@ -10,6 +10,6 @@ jobs:
     strategy:
       fail-fast: false
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: cvmfs-contrib/github-action-cvmfs@v3
     - uses: key4hep/key4hep-actions/downstream-build@main
