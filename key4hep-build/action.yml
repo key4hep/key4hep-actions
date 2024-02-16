@@ -58,7 +58,7 @@ runs:
           else
             cmake .. -DCMAKE_CXX_STANDARD=17 -DCMAKE_INSTALL_PREFIX=../install -G Ninja
           fi
-          ninja install
+          ninja
           ctest -j $(nproc) --output-on-failure
 
 
