@@ -37,6 +37,7 @@ runs:
       shell: bash
       run: |
           cat <<'EOF' > ${GITHUB_WORKSPACE}/script_container.sh
+          dnf install -y ccache
           set -e
           /mount.sh
 
