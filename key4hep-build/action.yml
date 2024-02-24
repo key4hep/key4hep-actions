@@ -44,6 +44,7 @@ runs:
           /mount.sh
 
           export CCACHE_DIR=/root/.cache/ccache
+          export CCACHE_SLOPPINESS=include_file_ctime,include_file_mtime
           ccache --set-config=max_size=100M
 
           if [ "${{ inputs.build_type }}" = "release" ]; then
