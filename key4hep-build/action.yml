@@ -15,7 +15,7 @@ runs:
     - shell: bash
       run: echo "NOW=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
-    - uses: actions/cache@v3
+    - uses: actions/cache@v4
       with:
         path: ~/.cache/ccache
         key: ${{ inputs.build_type }}-${{ inputs.image }}-${{ env.NOW }}
