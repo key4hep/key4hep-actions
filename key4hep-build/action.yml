@@ -61,9 +61,9 @@ runs:
           export PYTHONPATH=$(echo $PYTHONPATH | tr ':' '\n' | grep -v "/$name/" | tr '\n' ':')
 
           if [ "${{ inputs.build_type }}" = "nightly" ]; then
-            cmake .. -DCMAKE_CXX_STANDARD=20 -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_CXX_LAUNCHER=ccache -G Ninja
+            cmake .. -DCMAKE_CXX_STANDARD=20 -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -G Ninja
           else
-            cmake .. -DCMAKE_CXX_STANDARD=17 -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_CXX_LAUNCHER=ccache -G Ninja
+            cmake .. -DCMAKE_CXX_STANDARD=17 -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -G Ninja
           fi
           ninja install
           ctest -j $(nproc) --output-on-failure
