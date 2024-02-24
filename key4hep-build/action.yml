@@ -45,7 +45,7 @@ runs:
 
           export CCACHE_DIR=/root/.cache/ccache
           export CCACHE_SLOPPINESS=include_file_ctime,include_file_mtime
-          ccache --set-config=max_size=100M
+          ccache --set-config=max_size=1G
 
           find /root/.cache/ccache
 
