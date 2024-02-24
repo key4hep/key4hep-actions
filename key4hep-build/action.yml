@@ -37,7 +37,6 @@ runs:
       shell: bash
       run: |
           cat <<'EOF' > ${GITHUB_WORKSPACE}/script_container.sh
-          dnf install -y ccache
           set -e
           /mount.sh
 
@@ -66,7 +65,7 @@ runs:
           else
             cmake .. -DCMAKE_CXX_STANDARD=17 -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -G Ninja
           fi
-          ninja install
+          time ninja install
           ctest -j $(nproc) --output-on-failure
           ccache -s
 
