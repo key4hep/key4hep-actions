@@ -43,6 +43,7 @@ runs:
           set -e
           /mount.sh
 
+          export CCACHE_DIR=/root/.cache/ccache
           ccache --set-config=max_size=100M
 
           if [ "${{ inputs.build_type }}" = "release" ]; then
