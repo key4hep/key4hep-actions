@@ -47,7 +47,7 @@ runs:
           export CCACHE_SLOPPINESS=include_file_ctime,include_file_mtime
           ccache --set-config=max_size=1G
 
-          find /root/.cache/ccache
+          find /root/.cache/ccache -type f | sort
 
           if [ "${{ inputs.build_type }}" = "release" ]; then
             source /cvmfs/sw.hsf.org/key4hep/setup.sh
@@ -77,6 +77,8 @@ runs:
           time ninja install
           ctest -j $(nproc) --output-on-failure
           ccache -s
+
+          find /root/.cache/ccache -type f | sort
 
 
           EOF
