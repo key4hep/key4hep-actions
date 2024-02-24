@@ -23,11 +23,11 @@ runs:
       shell: bash
       run: |
         if [ "${{ inputs.image }}" = "alma9" ]; then
-          docker run --name container --privileged -v ${GITHUB_WORKSPACE}:/Package -v ~/.cache/ccache:/root/.config/ccache -d ghcr.io/key4hep/key4hep-images/alma9-cvmfs tail -f /dev/null
+          docker run --name container --privileged -v ${GITHUB_WORKSPACE}:/Package -v ~/.cache/ccache:/root/.cache/ccache -d ghcr.io/key4hep/key4hep-images/alma9-cvmfs tail -f /dev/null
         elif [ "${{ inputs.image }}" = "ubuntu22" ]; then
-          docker run --name container --privileged -v ${GITHUB_WORKSPACE}:/Package -v ~/.cache/ccache:/root/.config/ccache -d ghcr.io/key4hep/key4hep-images/ubuntu22-cvmfs tail -f /dev/null
+          docker run --name container --privileged -v ${GITHUB_WORKSPACE}:/Package -v ~/.cache/ccache:/root/.cache/ccache -d ghcr.io/key4hep/key4hep-images/ubuntu22-cvmfs tail -f /dev/null
         elif [ "${{ inputs.image }}" = "centos7" ]; then
-          docker run --name container --privileged -v ${GITHUB_WORKSPACE}:/Package -v ~/.cache/ccache:/root/.config/ccache -d ghcr.io/key4hep/key4hep-images/centos7-cvmfs tail -f /dev/null
+          docker run --name container --privileged -v ${GITHUB_WORKSPACE}:/Package -v ~/.cache/ccache:/root/.cache/ccache -d ghcr.io/key4hep/key4hep-images/centos7-cvmfs tail -f /dev/null
         else
           echo "Unknown image"
           exit 1
