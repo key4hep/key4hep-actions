@@ -47,6 +47,8 @@ runs:
           export CCACHE_SLOPPINESS=include_file_ctime,include_file_mtime
           ccache --set-config=max_size=100M
 
+          find /root/.cache/ccache
+
           if [ "${{ inputs.build_type }}" = "release" ]; then
             source /cvmfs/sw.hsf.org/key4hep/setup.sh
           elif [ "${{ inputs.build_type }}" = "nightly" ]; then
