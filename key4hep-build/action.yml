@@ -12,12 +12,14 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - run: echo "NOW=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+
     - uses: actions/cache@v3
       with:
         path: ~/.cache/ccache
-        key: ${{ runner.os }}-ccache-${{ hashFiles('**/CMakeLists.txt') }}
+        key: ${{ inputs.build_type }}-${{ inputs.image }}-${{ env.NOW }}
         restore-keys: |
-          ${{ runner.os }}-ccache-
+          ${{ inputs.build_type }}-${{ inputs.image }}
 
     - name: Start container
       shell: bash
@@ -39,6 +41,8 @@ runs:
           cat <<'EOF' > ${GITHUB_WORKSPACE}/script_container.sh
           set -e
           /mount.sh
+
+          ccache --set-config=max_size=100M
 
           if [ "${{ inputs.build_type }}" = "release" ]; then
             source /cvmfs/sw.hsf.org/key4hep/setup.sh
