@@ -58,15 +58,6 @@ runs:
             exit 1
           fi
 
-          # Preload ROOT for some packages that have tests that depend on ROOT
-          load_root=("edm4hep" "k4fwcore")
-          for package in "${load_root[@]}"; do
-              if [ $package = $name ]; then
-                  python3 -c "import ROOT"&
-                  break
-              fi
-          done
-
           cd /Package
           mkdir build
           cd build
