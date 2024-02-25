@@ -47,7 +47,16 @@ runs:
           export CCACHE_SLOPPINESS=include_file_ctime,include_file_mtime
           ccache --set-config=max_size=1G
 
-          find /root/.cache/ccache -type f | sort
+          name=$(echo "${{ github.event.repository.name }}" | tr '[:upper:]' '[:lower:]')
+          # Preload ROOT for some packages that have tests that depend on ROOT
+          load_root=("edm4hep" "k4fwcore")
+          for package in "${load_root[@]}"; do
+              if [ $package = $name ]; then
+                  python -c "import ROOT"&
+                  break
+              fi
+          done
+
 
           if [ "${{ inputs.build_type }}" = "release" ]; then
             source /cvmfs/sw.hsf.org/key4hep/setup.sh
@@ -62,7 +71,6 @@ runs:
           mkdir build
           cd build
 
-          name=$(echo "${{ github.event.repository.name }}" | tr '[:upper:]' '[:lower:]')
           export PATH=$(echo $PATH | tr ':' '\n' | grep -v "/$name/" | tr '\n' ':')
           export LD_LIBRARY_PATH=$(echo $LD_LIBRARY_PATH | tr ':' '\n' | grep -v "/$name/" | tr '\n' ':')
           export ROOT_INCLUDE_PATH=$(echo $ROOT_INCLUDE_PATH | tr ':' '\n' | grep -v "/$name/" | tr '\n' ':')
@@ -77,8 +85,6 @@ runs:
           time ninja install
           ctest -j $(nproc) --output-on-failure
           ccache -s
-
-          find /root/.cache/ccache -type f | sort
 
 
           EOF
