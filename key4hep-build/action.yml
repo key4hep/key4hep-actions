@@ -52,7 +52,7 @@ runs:
           load_root=("edm4hep" "k4fwcore")
           for package in "${load_root[@]}"; do
               if [ $package = $name ]; then
-                  python -c "import ROOT"&
+                  python3 -c "import ROOT"&
                   break
               fi
           done
