@@ -49,6 +49,11 @@ runs:
 
           name=$(echo "${{ github.event.repository.name }}" | tr '[:upper:]' '[:lower:]')
 
+          if [ -x "$(command -v mold)" ]; then
+            export LDFLAGS="-fuse-ld=mold"
+            echo "Using the mold linker"
+          fi
+
           if [ "${{ inputs.build_type }}" = "release" ]; then
             source /cvmfs/sw.hsf.org/key4hep/setup.sh
           elif [ "${{ inputs.build_type }}" = "nightly" ]; then
