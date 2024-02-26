@@ -50,7 +50,8 @@ runs:
           name=$(echo "${{ github.event.repository.name }}" | tr '[:upper:]' '[:lower:]')
 
           if [ -x "$(command -v mold)" ]; then
-            export LDFLAGS="-fuse-ld=mold"
+            rm /usr/bin/ld
+            ln -s /usr/bin/mold /usr/bin/ld
             echo "Using the mold linker"
           fi
 
