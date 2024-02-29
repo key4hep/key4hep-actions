@@ -54,6 +54,12 @@ runs:
         # Exit now if there is any command that fails
         set -e
 
+        # If there aren't any packages leave
+        if [ -z "$(ls /Workarea)" ]; then
+            echo "No packages depend on this one, exiting"
+            exit 0
+        fi
+
         for package in $(ls)
         do
             paths="/${package:3}/|$paths"
@@ -79,8 +85,8 @@ runs:
         export ROOT_INCLUDE_PATH=$PWD/include:$ROOT_INCLUDE_PATH
         export PYTHONPATH=$PWD/python:$PYTHONPATH
         export CMAKE_PREFIX_PATH=$PWD:$CMAKE_PREFIX_PATH
-        cd /Workarea
 
+        cd /Workarea
         for package in $(ls)
         do
             cd $package
