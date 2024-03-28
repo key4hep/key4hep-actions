@@ -1,6 +1,15 @@
 # key4hep-actions
 Github actions for CI in the key4hep stack
 
+# Key4hep build
+This action builds the Key4hep stack on the supported OSes for both the stable
+releases and the nightlies. After that, it runs the available tests using
+`ctest`. It also runs during the night every day to populate a cache (using
+`ccache`) that is later used by the action (for example, in pull requests) so
+that building will be faster if they files that are built haven't changed. For
+example, for a simple change in a README file the builds will be very fast since
+all the files are cached, but the workflow may take longer because of the tests.
+
 # Downstream build
 This action does two things:
 - Builds packages downstream to check that the changes that were made do not
