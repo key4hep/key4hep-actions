@@ -26,11 +26,11 @@ runs:
       shell: bash
       run: |
         if [ "${{ inputs.image }}" = "alma9" ]; then
-          docker run --name container --privileged -v ${GITHUB_WORKSPACE}:/Package -v ~/.cache/ccache:/root/.cache/ccache -d ghcr.io/key4hep/key4hep-images/alma9-cvmfs tail -f /dev/null
+          docker run --name container --privileged -v ${GITHUB_WORKSPACE}:/${{ github.event.repository.name }} -v ~/.cache/ccache:/root/.cache/ccache -d ghcr.io/key4hep/key4hep-images/alma9-cvmfs tail -f /dev/null
         elif [ "${{ inputs.image }}" = "ubuntu22" ]; then
-          docker run --name container --privileged -v ${GITHUB_WORKSPACE}:/Package -v ~/.cache/ccache:/root/.cache/ccache -d ghcr.io/key4hep/key4hep-images/ubuntu22-cvmfs tail -f /dev/null
+          docker run --name container --privileged -v ${GITHUB_WORKSPACE}:/${{ github.event.repository.name }} -v ~/.cache/ccache:/root/.cache/ccache -d ghcr.io/key4hep/key4hep-images/ubuntu22-cvmfs tail -f /dev/null
         elif [ "${{ inputs.image }}" = "centos7" ]; then
-          docker run --name container --privileged -v ${GITHUB_WORKSPACE}:/Package -v ~/.cache/ccache:/root/.cache/ccache -d ghcr.io/key4hep/key4hep-images/centos7-cvmfs tail -f /dev/null
+          docker run --name container --privileged -v ${GITHUB_WORKSPACE}:/${{ github.event.repository.name }} -v ~/.cache/ccache:/root/.cache/ccache -d ghcr.io/key4hep/key4hep-images/centos7-cvmfs tail -f /dev/null
         else
           echo "Unknown image"
           exit 1
@@ -41,7 +41,6 @@ runs:
       run: |
           cat <<'EOF' > ${GITHUB_WORKSPACE}/script_container.sh
           set -e
-          /mount.sh
 
           export CCACHE_DIR=/root/.cache/ccache
           export CCACHE_SLOPPINESS=include_file_ctime,include_file_mtime
@@ -65,7 +64,8 @@ runs:
             exit 1
           fi
 
-          cd /Package
+          cd /${name}
+          k4_local_repo
           mkdir build
           cd build
 
@@ -89,4 +89,4 @@ runs:
 
           cat ${GITHUB_WORKSPACE}/script_container.sh
 
-          docker exec container /bin/bash /Package/script_container.sh
+          docker exec container /bin/bash /${GITHUB_REPOSITORY}/script_container.sh
