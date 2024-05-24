@@ -89,4 +89,4 @@ runs:
 
           cat ${GITHUB_WORKSPACE}/script_container.sh
 
-          docker exec container /bin/bash /${GITHUB_REPOSITORY}/script_container.sh
+          docker exec container /bin/bash ${GITHUB_WORKSPACE}/script_container.sh
