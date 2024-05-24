@@ -87,6 +87,8 @@ runs:
 
           EOF
 
-          cat ${GITHUB_WORKSPACE}/script_container.sh
+          chmod +x ${GITHUB_WORKSPACE}/script_container.sh
+
+          # cat ${GITHUB_WORKSPACE}/script_container.sh
 
           docker exec container /bin/bash -c "/mount.sh && /${{ github.event.repository.name }}/script_container.sh"
