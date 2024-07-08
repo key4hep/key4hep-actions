@@ -6,7 +6,7 @@ inputs:
     description: release or nightly
     required: true
   image:
-    description: alma9, ubuntu22 or centos7
+    description: alma9, ubuntu22
     required: true
 
 runs:
@@ -30,8 +30,6 @@ runs:
           docker run --name container --privileged -v ${GITHUB_WORKSPACE}:/${name} -v ~/.cache/ccache:/root/.cache/ccache -d ghcr.io/key4hep/key4hep-images/alma9-cvmfs tail -f /dev/null
         elif [ "${{ inputs.image }}" = "ubuntu22" ]; then
           docker run --name container --privileged -v ${GITHUB_WORKSPACE}:/${name} -v ~/.cache/ccache:/root/.cache/ccache -d ghcr.io/key4hep/key4hep-images/ubuntu22-cvmfs tail -f /dev/null
-        elif [ "${{ inputs.image }}" = "centos7" ]; then
-          docker run --name container --privileged -v ${GITHUB_WORKSPACE}:/${name} -v ~/.cache/ccache:/root/.cache/ccache -d ghcr.io/key4hep/key4hep-images/centos7-cvmfs tail -f /dev/null
         else
           echo "Unknown image"
           exit 1
@@ -78,11 +76,7 @@ runs:
           export CPATH=$(echo $CPATH | tr ':' '\n' | grep -v "/$name/" | tr '\n' ':')
           export PYTHONPATH=$(echo $PYTHONPATH | tr ':' '\n' | grep -v "/$name/" | tr '\n' ':')
 
-          if [ "${{ inputs.build_type }}" = "nightly" ]; then
-            cmake .. -DCMAKE_CXX_STANDARD=20 -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -G Ninja
-          else
-            cmake .. -DCMAKE_CXX_STANDARD=17 -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -G Ninja
-          fi
+          cmake .. -DCMAKE_CXX_STANDARD=20 -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -G Ninja
           time ninja install
           ctest -j $(nproc) --output-on-failure
           ccache -s
