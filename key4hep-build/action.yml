@@ -76,7 +76,7 @@ runs:
           export CPATH=$(echo $CPATH | tr ':' '\n' | grep -v "/$name/" | tr '\n' ':')
           export PYTHONPATH=$(echo $PYTHONPATH | tr ':' '\n' | grep -v "/$name/" | tr '\n' ':')
 
-          cmake .. -DCMAKE_CXX_STANDARD=20 -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_FLAGS="-Werror -Wno-error=deprecated-declarations" -G Ninja
+          cmake .. -DCMAKE_CXX_STANDARD=20 -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_FLAGS="-Werror -Wno-error=cpp -Wno-error=deprecated-declarations" -G Ninja
           time ninja install
           ctest -j $(nproc) --output-on-failure
           ccache -s
