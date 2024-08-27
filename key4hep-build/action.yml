@@ -90,9 +90,9 @@ runs:
 
           docker exec container /bin/bash -c "/mount.sh && /${name}/script_container.sh"
 
-  - name: 'Upload EDM4hep file'
-    uses: actions/upload-artifact@v4
-    with:
-      name: EDM4hep file
-      path: tests/output.root
-      retention-days: 7
+    - name: 'Upload EDM4hep file'
+        uses: actions/upload-artifact@v4
+        with:
+          name: EDM4hep file
+          path: tests/output.root
+          retention-days: 7
