@@ -96,5 +96,5 @@ runs:
       uses: actions/upload-artifact@v4
       with:
         name: EDM4hep file
-        path: ${GITHUB_WORKSPACE}/build/test/output.root
+        path: ${{ github.workspace }}/build/test/output.root
         retention-days: 7
