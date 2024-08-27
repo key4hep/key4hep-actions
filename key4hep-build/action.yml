@@ -90,8 +90,6 @@ runs:
 
           docker exec container /bin/bash -c "/mount.sh && /${name}/script_container.sh"
 
-          find ${GITHUB_WORKSPACE}
-
     - name: Upload EDM4hep file
       if: github.repository == 'key4hep/EDM4hep'
       uses: actions/upload-artifact@v4
