@@ -32,7 +32,7 @@ runs:
         git clone https://github.com/key4hep/key4hep-spack --single-branch -q
         cd key4hep-spack
         git checkout $(cat $rel/.key4hep-spack-commit)
-        spack env activate environments/key4hep-nightly
+        spack env activate environments/key4hep-nightly-opt
         cd ..
 
         name=$(echo "${{ github.event.repository.name }}" | tr "[:upper:]" "[:lower:]")
