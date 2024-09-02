@@ -94,7 +94,9 @@ runs:
       if: github.repository == 'key4hep/EDM4hep'
       uses: actions/upload-artifact@v4
       with:
-        name: EDM4hep file
-        path: ${{ github.workspace }}/build/test/output.root
+        name: EDM4hep example files (TTree and RNTuple)
+        path: |
+          ${{ github.workspace }}/build/test/edm4hep_example.root
+          ${{ github.workspace }}/build/test/edm4hep_example_rntuple.root
         retention-days: 7
         overwrite: true
