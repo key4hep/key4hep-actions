@@ -63,6 +63,7 @@ runs:
             if [ "${{ inputs.compiler }}" = "gcc11" ]; then
               command="$command -c gcc11"
             fi
+            eval $command
           else
             echo "Unknown build type"
             exit 1
