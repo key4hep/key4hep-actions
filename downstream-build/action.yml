@@ -52,7 +52,7 @@ runs:
         python3 /Package/key4hep-dev-utils/scripts/fetch_and_checkout.py $name "$branch_packages"
 
         # Exit now if there is any command that fails
-        set -e
+        # set -e
 
         # If there aren't any packages leave
         if [ -z "$(ls /Workarea)" ]; then
