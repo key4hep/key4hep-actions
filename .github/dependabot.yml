@@ -7,11 +7,11 @@ version: 2
 updates:
   # Keep dependencies for GitHub Actions up-to-date
   - package-ecosystem: 'github-actions'
-    directory: '/key4hep-build'
+    directory: '/downstream-build'
     schedule:
       interval: 'weekly'
   - package-ecosystem: 'github-actions'
-    directory: '/downstream-build'
+    directory: '/key4hep-build'
     schedule:
       interval: 'weekly'
   - package-ecosystem: 'github-actions'
