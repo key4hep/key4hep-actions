@@ -47,7 +47,7 @@ runs:
         spack config add "upstreams:nightly:install_tree: $rel"
         mkdir /Workarea
         cd /Workarea
-        git log
+        python3 /Package/key4hep-dev-utils/scripts/fetch_and_checkout.py $name
 
         # Exit now if there is any command that fails
         # set -e
