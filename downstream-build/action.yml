@@ -39,8 +39,6 @@ runs:
         echo $name
 
         git clone https://github.com/key4hep/key4hep-dev-utils --depth 1 -q
-        # branch_packages=$(python3 /Package/key4hep-dev-utils/scripts/parse.py " ${{ github.event.pull_request.body }} " ) 
-        # echo "branch_packages = $branch_packages"
         latest_rel=$(find /cvmfs/sw-nightlies.hsf.org/key4hep/releases/ -maxdepth 3 -type f -wholename "*almalinux9*/.spack-commit" | sort -r | head -1)
         latest_rel=$(dirname $latest_rel)
         if [ "$rel" != "$latest_rel" ]; then \
@@ -49,7 +47,7 @@ runs:
         spack config add "upstreams:nightly:install_tree: $rel"
         mkdir /Workarea
         cd /Workarea
-        python3 /Package/key4hep-dev-utils/scripts/fetch_and_checkout.py $name "$branch_packages"
+        git log
 
         # Exit now if there is any command that fails
         # set -e
