@@ -6,8 +6,12 @@ inputs:
     description: release or nightly
     required: true
   image:
-    description: alma9, ubuntu22
+    description: alma9, ubuntu22 or ubuntu24
     required: true
+  stack:
+    description: key4hep or lcg
+    required: false
+    default: key4hep
 
 runs:
   using: "composite"
@@ -57,20 +61,35 @@ runs:
           fi
 
           if [ "${{ inputs.build_type }}" = "release" ]; then
-            source /cvmfs/sw.hsf.org/key4hep/setup.sh
-          elif [ "${{ inputs.build_type }}" = "nightly" ]; then
-            command="source /cvmfs/sw-nightlies.hsf.org/key4hep/setup.sh"
-            if [ "${{ inputs.compiler }}" = "gcc11" ]; then
-              command="$command -c gcc11"
+            if [ "${{ inputs.stack }}" = "key4hep" ]; then
+              source /cvmfs/sw.hsf.org/key4hep/setup.sh
+            elif [ "${{ inputs.stack }}" = "lcg" ]; then
+              source /cvmfs/sft.cern.ch/lcg/views/devkey/latest/x86_64-el9-gcc14-opt/setup.sh
+            else
+              echo "Unknown stack ${{ inputs.stack }}"
+              exit 1
             fi
-            eval $command
+          elif [ "${{ inputs.build_type }}" = "nightly" ]; then
+            if [ "${{ inputs.stack }}" = "key4hep" ]; then
+              command="source /cvmfs/sw-nightlies.hsf.org/key4hep/setup.sh"
+              if [ "${{ inputs.compiler }}" = "gcc11" ]; then
+                command="$command -c gcc11"
+              fi
+              eval $command
+            elif [ "${{ inputs.stack }}" = "lcg" ]; then
+              source /cvmfs/sft-nightlies.cern.ch/lcg/views/devkey-head/latest/x86_64-el9-gcc14-opt/setup.sh
+            else
+              echo "Unknown stack ${{ inputs.stack }}"
+              exit 1
+            fi
           else
             echo "Unknown build type"
             exit 1
           fi
 
           cd /${name}
-          k4_local_repo
+          # There is no k4_local_repo in the LCG stacks
+          k4_local_repo || true
           mkdir build
           cd build
 
@@ -82,8 +101,19 @@ runs:
 
           cmake .. -DCMAKE_CXX_STANDARD=20 -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_CXX_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_FLAGS="-Werror -Wno-error=cpp -Wno-error=deprecated-declarations" -G Ninja
           time ninja -k0 install
-          ctest -j $(nproc) --output-on-failure
           ccache -s
+
+          # For LCG stacks there is nothing pointing to the new environment
+          # so we have to make sure that the new files are picked
+          if [ "${{ inputs.stack }}" = "lcg" ]; then
+            export PATH=/${name}/install/bin:$PATH
+            export LD_LIBRARY_PATH=/${name}/install/lib:${name}/install/lib64:$LD_LIBRARY_PATH
+            export ROOT_INCLUDE_PATH=/${name}/install/include:$ROOT_INCLUDE_PATH
+            export CPATH=/${name}/install/include:$CPATH
+            export PYTHONPATH=/${name}/install/lib/python*/site-packages:/${name}/install/python:$PYTHONPATH
+          fi
+
+          ctest -j $(nproc) --output-on-failure
 
 
           EOF
