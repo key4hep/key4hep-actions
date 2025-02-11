@@ -34,6 +34,8 @@ runs:
           docker run --name container --privileged -v ${GITHUB_WORKSPACE}:/${name} -v ~/.cache/ccache:/root/.cache/ccache -d ghcr.io/key4hep/key4hep-images/alma9-cvmfs tail -f /dev/null
         elif [ "${{ inputs.image }}" = "ubuntu22" ]; then
           docker run --name container --privileged -v ${GITHUB_WORKSPACE}:/${name} -v ~/.cache/ccache:/root/.cache/ccache -d ghcr.io/key4hep/key4hep-images/ubuntu22-cvmfs tail -f /dev/null
+        elif [ "${{ inputs.image }}" = "ubuntu24" ]; then
+          docker run --name container --privileged -v ${GITHUB_WORKSPACE}:/${name} -v ~/.cache/ccache:/root/.cache/ccache -d ghcr.io/key4hep/key4hep-images/ubuntu24-cvmfs tail -f /dev/null
         else
           echo "Unknown image"
           exit 1
