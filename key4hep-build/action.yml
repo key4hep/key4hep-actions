@@ -9,7 +9,7 @@ inputs:
     description: alma9, ubuntu22 or ubuntu24
     required: true
   stack:
-    description: key4hep or lcg
+    description: key4hep or devkey
     required: false
     default: key4hep
 
@@ -63,7 +63,7 @@ runs:
           if [ "${{ inputs.build_type }}" = "release" ]; then
             if [ "${{ inputs.stack }}" = "key4hep" ]; then
               source /cvmfs/sw.hsf.org/key4hep/setup.sh
-            elif [ "${{ inputs.stack }}" = "lcg" ]; then
+            elif [ "${{ inputs.stack }}" = "devkey" ]; then
               source /cvmfs/sft.cern.ch/lcg/views/devkey/latest/x86_64-el9-gcc14-opt/setup.sh
             else
               echo "Unknown stack ${{ inputs.stack }}"
@@ -76,7 +76,7 @@ runs:
                 command="$command -c gcc11"
               fi
               eval $command
-            elif [ "${{ inputs.stack }}" = "lcg" ]; then
+            elif [ "${{ inputs.stack }}" = "devkey" ]; then
               source /cvmfs/sft-nightlies.cern.ch/lcg/views/devkey-head/latest/x86_64-el9-gcc14-opt/setup.sh
             else
               echo "Unknown stack ${{ inputs.stack }}"
@@ -105,7 +105,7 @@ runs:
 
           # For LCG stacks there is nothing pointing to the new environment
           # so we have to make sure that the new files are picked
-          if [ "${{ inputs.stack }}" = "lcg" ]; then
+          if [ "${{ inputs.stack }}" = "devkey" ]; then
             export PATH=/${name}/install/bin:$PATH
             export LD_LIBRARY_PATH=/${name}/install/lib:${name}/install/lib64:$LD_LIBRARY_PATH
             export ROOT_INCLUDE_PATH=/${name}/install/include:$ROOT_INCLUDE_PATH
