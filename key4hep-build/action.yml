@@ -3,13 +3,13 @@ description: Build and test using the Key4hep stack
 
 inputs:
   build_type:
-    description: release or nightly
+    description: release or nightly or other
     required: true
   image:
     description: alma9, ubuntu22 or ubuntu24
     required: true
   stack:
-    description: key4hep or devkey
+    description: key4hep or devkey or full path to the setup script
     required: false
     default: key4hep
 
@@ -62,7 +62,9 @@ runs:
             echo "Using the mold linker"
           fi
 
-          if [ "${{ inputs.build_type }}" = "release" ]; then
+          if [[ "${{ inputs.stack }}" =~ cvmfs ]]; then
+            source ${{ inputs.stack }}
+          elif [ "${{ inputs.build_type }}" = "release" ]; then
             if [ "${{ inputs.stack }}" = "key4hep" ]; then
               source /cvmfs/sw.hsf.org/key4hep/setup.sh
             elif [ "${{ inputs.stack }}" = "devkey" ]; then
