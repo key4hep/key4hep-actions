@@ -12,11 +12,6 @@ inputs:
     description: key4hep or devkey or full path to the setup script
     required: false
     default: key4hep
-  extra_cmake_args:
-    description: "Additional arguments to cmake"
-    required: false
-    type: string
-    default: ''
 
 runs:
   using: "composite"
@@ -102,6 +97,10 @@ runs:
           mkdir build
           cd build
 
+          if [ -f /${name}/.github/workflows/.key4hep-build-env ]; then
+            source /${name}/.github/workflows/.key4hep-build-env
+          fi
+
           export PATH=$(echo $PATH | tr ':' '\n' | grep -v "/$name/" | tr '\n' ':')
           export LD_LIBRARY_PATH=$(echo $LD_LIBRARY_PATH | tr ':' '\n' | grep -v "/$name/" | tr '\n' ':')
           export ROOT_INCLUDE_PATH=$(echo $ROOT_INCLUDE_PATH | tr ':' '\n' | grep -v "/$name/" | tr '\n' ':')
@@ -114,7 +113,7 @@ runs:
             -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
             -DCMAKE_CXX_FLAGS="-Werror -Wno-error=cpp -Wno-error=deprecated-declarations" \
             -G Ninja \
-            ${{ inputs.extra_cmake_args }}
+            ${K4_EXTRA_CMAKE_ARGS}
           time ninja -k0 install
           ccache -s
 
