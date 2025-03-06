@@ -98,6 +98,10 @@ runs:
           cd build
 
           if [ -f /${name}/.github/workflows/.key4hep-build-env ]; then
+            echo "Sourcing .keyhep-build-env"
+            echo "----------------------------------"
+            cat /${name}/.github/workflows/.key4hep-build-env
+            echo "----------------------------------"
             source /${name}/.github/workflows/.key4hep-build-env
           fi
 
