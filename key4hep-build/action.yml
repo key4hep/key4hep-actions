@@ -117,7 +117,7 @@ runs:
             -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
             -DCMAKE_CXX_FLAGS="-Werror -Wno-error=cpp -Wno-error=deprecated-declarations" \
             -G Ninja \
-            ${K4_EXTRA_CMAKE_ARGS}
+            ${K4_CMAKE_EXTRA_ARGS}
           time ninja -k0 install
           ccache -s
 
