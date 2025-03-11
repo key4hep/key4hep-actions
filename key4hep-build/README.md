@@ -17,6 +17,9 @@ Additionally, there is an optional paramter:
 - `stack`: For switching between `key4hep` (default) and `devkey`. **This is a
   feature for development, so you almost certainly don't need to change this.**
   
+The recommended way of running the action is to have scheduled runs at some point in the day
+(for example, after builds for that day have been deployed for nightly builds) because the compilation 
+results will be cached, allowing future PRs to reuse the results and compile much faster.
 ## Furter customization
 
 In order to allow further customization of the build and its environment it is
