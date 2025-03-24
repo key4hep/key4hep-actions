@@ -22,4 +22,4 @@ jobs:
       - name: Run pre-commit
         run: |
              docker run --privileged -v ${GITHUB_WORKSPACE}:/workspace -w /workspace ghcr.io/key4hep/key4hep-images/alma9-cvmfs\
-                        /bin/bash -c "source /cvmfs/sw-nightlies.hsf.org/key4hep/setup.sh && git config --global safe.directory /workspace && pre-commit run --all-files --show-diff-on-failure"
+                        /bin/bash -c "source /cvmfs/sw-nightlies.hsf.org/key4hep/setup.sh && git config --global safe.directory /workspace && pre-commit run --all-files --show-diff-on-failure --color=always"
