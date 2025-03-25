@@ -1,0 +1,19 @@
+name: "Cache CMake External Data"
+description: "Caches the external data that we fetch via CMake"
+inputs:
+  store-key-base:
+    required: False
+    description: The base of the store key (will be suffixed with todays date)
+    default: "external-data"
+
+runs:
+  using: "composite"
+  steps:
+  - shell: bash
+    run: echo "NOW=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+  - uses: actions/cache@v4
+    with:
+      path: ${{ github.workspace }}/build/ExternalData
+      key: ${{ inputs.store-key-base }}-${{ env.NOW }}
+      restore-keys: |
+        external-data

@@ -26,13 +26,6 @@ runs:
         restore-keys: |
           ${{ inputs.build_type }}-${{ inputs.image }}
 
-    - uses: actions/cache@v4
-      with:
-        path: ${{ github.workspace }}/build/ExternalData
-        key: external-data-${{ inputs.build_type }}-${{ inputs.image }}-${{ env.NOW }}
-        restore-keys: |
-          external-data
-
     - name: Start container
       shell: bash
       run: |
