@@ -14,6 +14,4 @@ runs:
   - uses: actions/cache@v4
     with:
       path: ${{ github.workspace }}/build/ExternalData
-      key: ${{ inputs.store-key-base }}-${{ env.NOW }}
-      restore-keys: |
-        external-data
+      key: ${{ inputs.store-key-base }}
