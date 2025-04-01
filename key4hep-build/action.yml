@@ -99,7 +99,7 @@ runs:
           cd /${name}
           # There is no k4_local_repo in the LCG stacks
           k4_local_repo || true
-          mkdir build
+          mkdir -p build
           cd build
 
           if [ -f /${name}/.github/workflows/.key4hep-build-env ]; then
