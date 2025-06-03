@@ -158,3 +158,13 @@ runs:
           ${{ github.workspace }}/build/test/edm4hep_example_rntuple.root
         retention-days: 7
         overwrite: true
+
+    - name: Upload CLDConfig file
+      if: github.repository == 'key4hep/CLDConfig'
+      uses: actions/upload-artifact@v4
+      with:
+        name: AIDA ROOT File
+        path: |
+          ${{ github.workspace }}/CLDConfig/rec_test_edm4hep_aida.root
+        retention-days: 7
+        overwrite: true
