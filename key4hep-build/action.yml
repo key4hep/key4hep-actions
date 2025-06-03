@@ -168,3 +168,15 @@ runs:
           ${{ github.workspace }}/CLDConfig/rec_test_edm4hep_aida.root
         retention-days: 7
         overwrite: true
+
+    - name: Upload FCC-config file
+      if: github.repository == 'HEP-FCC/FCC-config'
+      uses: actions/upload-artifact@v4
+      with:
+        name: ALLEGRO and IDEA sim-digi-reco files
+        path: |
+          ${{ github.workspace }}/FCCee/FullSim/ALLEGRO/ALLEGRO_o1_v03/ALLEGRO_sim_digi_reco.root
+          ${{ github.workspace }}/FCCee/FullSim/IDEA/IDEA_o1_v03/IDEA_sim_digi_reco.root
+        retention-days: 7
+        overwrite: true
+
