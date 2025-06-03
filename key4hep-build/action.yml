@@ -175,8 +175,8 @@ runs:
       with:
         name: ALLEGRO and IDEA sim-digi-reco files
         path: |
-          ${{ github.workspace }}/FCCee/FullSim/ALLEGRO/ALLEGRO_o1_v03/ALLEGRO_sim_digi_reco.root
-          ${{ github.workspace }}/FCCee/FullSim/IDEA/IDEA_o1_v03/IDEA_sim_digi_reco.root
+          ${{ github.workspace }}/build/ALLEGRO_sim_digi_reco.root
+          ${{ github.workspace }}/build/IDEA_sim_digi_reco.root
         retention-days: 7
         overwrite: true
 
