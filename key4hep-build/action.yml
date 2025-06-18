@@ -12,12 +12,18 @@ inputs:
     description: key4hep or devkey or full path to the setup script
     required: false
     default: key4hep
+  release:
+    description: Which release (date) to use
+    required: False
+    default: ""
 
 runs:
   using: "composite"
   steps:
     - shell: bash
-      run: echo "NOW=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+      run: |
+        echo "NOW=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
+        echo KEY4HEP_REL_ARG=-r ${{ inputs.release }} >> $GITHUB_ENV
 
     - uses: actions/cache@v4
       with:
@@ -66,7 +72,7 @@ runs:
             source ${{ inputs.stack }}
           elif [ "${{ inputs.build_type }}" = "release" ]; then
             if [ "${{ inputs.stack }}" = "key4hep" ]; then
-              source /cvmfs/sw.hsf.org/key4hep/setup.sh
+              source /cvmfs/sw.hsf.org/key4hep/setup.sh ${{ env.KEY4HEP_REL_ARG }}
             elif [ "${{ inputs.stack }}" = "devkey" ]; then
               source /cvmfs/sft.cern.ch/lcg/views/devkey/latest/x86_64-el9-gcc14-opt/setup.sh
             else
