@@ -93,7 +93,7 @@ runs:
 
           function run_cmd() {
             echo $@
-            $@
+            "$@"
           }
 
           cd /${name}
