@@ -97,11 +97,6 @@ runs:
             exit 1
           fi
 
-          function run_cmd() {
-            echo $@
-            $@
-          }
-
           cd /${name}
           # There is no k4_local_repo in the LCG stacks
           k4_local_repo || true
@@ -116,19 +111,22 @@ runs:
             source /${name}/.github/workflows/.key4hep-build-env
           fi
 
+
           export PATH=$(echo $PATH | tr ':' '\n' | grep -v "/$name/" | tr '\n' ':')
           export LD_LIBRARY_PATH=$(echo $LD_LIBRARY_PATH | tr ':' '\n' | grep -v "/$name/" | tr '\n' ':')
           export ROOT_INCLUDE_PATH=$(echo $ROOT_INCLUDE_PATH | tr ':' '\n' | grep -v "/$name/" | tr '\n' ':')
           export CPATH=$(echo $CPATH | tr ':' '\n' | grep -v "/$name/" | tr '\n' ':')
           export PYTHONPATH=$(echo $PYTHONPATH | tr ':' '\n' | grep -v "/$name/" | tr '\n' ':')
 
-          run_cmd cmake .. \
+          set -x
+          cmake .. \
             -DCMAKE_CXX_STANDARD=20 \
             -DCMAKE_INSTALL_PREFIX=../install \
             -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
             -DCMAKE_CXX_FLAGS="-Werror -Wno-error=cpp -Wno-error=deprecated-declarations" \
             -G Ninja \
             ${K4_CMAKE_EXTRA_ARGS}
+          set +x
 
           time ninja -k0 install
           ccache -s
