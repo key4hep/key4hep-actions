@@ -61,7 +61,6 @@ runs:
             ln -s /usr/bin/mold /usr/bin/ld
             echo "Using the mold linker"
           fi
-
           if [[ "${{ inputs.stack }}" =~ cvmfs ]]; then
             source ${{ inputs.stack }}
           elif [ "${{ inputs.build_type }}" = "release" ]; then
@@ -90,6 +89,15 @@ runs:
             echo "Unknown build type"
             exit 1
           fi
+
+          mimalloc=$(echo $(dirname $(dirname $(dirname $(dirname $(which mold)))))/mimalloc/*/lib/libmimalloc.so)
+          if [ -f "$mimalloc" ]; then
+            export LD_PRELOAD=$mimalloc
+            echo "Using mimalloc: $mimalloc"
+          else
+            echo "mimalloc not found, using default allocator"
+          fi
+
 
           function run_cmd() {
             echo $@
