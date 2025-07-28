@@ -89,7 +89,6 @@ runs:
             echo "Unknown build type"
             exit 1
           fi
-          
           mimalloc=$(echo $(dirname $(dirname $(dirname $(dirname $(which mold)))))/mimalloc/*/lib/libmimalloc.so)
           if [ -f "$mimalloc" ]; then
             export LD_PRELOAD=$mimalloc
