@@ -26,16 +26,25 @@ runs:
         restore-keys: |
           ${{ inputs.build_type }}-${{ inputs.image }}
 
+    - uses: actions/cache@v4
+      with:
+        # Only cache the actual files since caching other files make cvmfs not to work
+        path: |
+            ~/.cache/cvmfs/??/*
+        key: cvmfs-${{ inputs.build_type }}-${{ inputs.image }}-${{ env.NOW }}
+        restore-keys: |
+          cvmfs-${{ inputs.build_type }}-${{ inputs.image }}
+
     - name: Start container
       shell: bash
       run: |
         name=$(echo "${{ github.event.repository.name }}" | tr '[:upper:]' '[:lower:]')
         if [ "${{ inputs.image }}" = "alma9" ]; then
-          docker run --name container --privileged -v ${GITHUB_WORKSPACE}:/${name} -v ~/.cache/ccache:/root/.cache/ccache -d ghcr.io/key4hep/key4hep-images/alma9-cvmfs tail -f /dev/null
+          docker run --name container --privileged -v ${GITHUB_WORKSPACE}:/${name} -v ~/.cache/ccache:/root/.cache/ccache -v ~/.cache/cvmfs:/var/lib/cvmfs/shared -d ghcr.io/key4hep/key4hep-images/alma9-cvmfs tail -f /dev/null
         elif [ "${{ inputs.image }}" = "ubuntu22" ]; then
-          docker run --name container --privileged -v ${GITHUB_WORKSPACE}:/${name} -v ~/.cache/ccache:/root/.cache/ccache -d ghcr.io/key4hep/key4hep-images/ubuntu22-cvmfs tail -f /dev/null
+          docker run --name container --privileged -v ${GITHUB_WORKSPACE}:/${name} -v ~/.cache/ccache:/root/.cache/ccache -v ~/.cache/cvmfs:/var/lib/cvmfs/shared -d ghcr.io/key4hep/key4hep-images/ubuntu22-cvmfs tail -f /dev/null
         elif [ "${{ inputs.image }}" = "ubuntu24" ]; then
-          docker run --name container --privileged -v ${GITHUB_WORKSPACE}:/${name} -v ~/.cache/ccache:/root/.cache/ccache -d ghcr.io/key4hep/key4hep-images/ubuntu24-cvmfs tail -f /dev/null
+          docker run --name container --privileged -v ${GITHUB_WORKSPACE}:/${name} -v ~/.cache/ccache:/root/.cache/ccache -v ~/.cache/cvmfs:/var/lib/cvmfs/shared -d ghcr.io/key4hep/key4hep-images/ubuntu24-cvmfs tail -f /dev/null
         else
           echo "Unknown image"
           exit 1
@@ -143,6 +152,10 @@ runs:
 
           ctest -j $(nproc) --output-on-failure
 
+
+          # Make the cvmfs cache 500 MB at most
+          chmod -R 777 /var/lib/cvmfs/shared
+          cvmfs_talk cleanup 500
 
           EOF
 
