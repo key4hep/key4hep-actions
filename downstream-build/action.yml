@@ -43,7 +43,7 @@ runs:
         python3 /Package/key4hep-dev-utils/scripts/fetch_and_checkout.py $name
 
         # Exit now if there is any command that fails
-        set -e
+        # set -e
 
         # If there aren't any packages leave
         if [ -z "$(ls /Workarea)" ]; then
@@ -63,11 +63,16 @@ runs:
             # echo $v is ${!v}
         done
 
+        status=0
         cd /Package/main
         mkdir build
         cd build
         cmake .. -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_CXX_STANDARD=20 -DBUILD_TESTING=OFF -G Ninja
         ninja && ninja install > /dev/null
+        build_ret=$?
+        if [ $build_ret -ne 0 ]; then
+            status=1
+        fi
         # Do not run the tests, this is already done in other CI workflows
         # ctest -j $(nproc) --output-on-failure
         cd ../install
@@ -85,7 +90,12 @@ runs:
             cd build
             cmake .. -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_CXX_STANDARD=20 -G Ninja
             ninja && ninja install > /dev/null
+            build_ret=$?
             ctest -j $(nproc) --output-on-failure
+            test_ret=$?
+            if [ $build_ret -ne 0 ] || [ $test_ret -ne 0 ]; then
+                status=1
+            fi
             cd ../install
             export PATH=$PWD/bin:$PATH
             export LD_LIBRARY_PATH=$PWD/lib:$PWD/lib64:$LD_LIBRARY_PATH
@@ -94,6 +104,7 @@ runs:
             export CMAKE_PREFIX_PATH=$PWD:$CMAKE_PREFIX_PATH
             cd ../..
         done
+        exit $status
 
         EOF
 
