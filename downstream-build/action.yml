@@ -91,8 +91,13 @@ runs:
             cmake .. -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_CXX_STANDARD=20 -G Ninja
             ninja && ninja install > /dev/null
             build_ret=$?
-            ctest -j $(nproc) --output-on-failure
-            test_ret=$?
+            if [ $build_ret -eq 0 ]; then
+                ctest -j $(nproc) --output-on-failure
+                test_ret=$?
+            else
+                test_ret=1
+                echo "Build failed for $package, skipping tests"
+            fi
             if [ $build_ret -ne 0 ] || [ $test_ret -ne 0 ]; then
                 status=1
             fi
