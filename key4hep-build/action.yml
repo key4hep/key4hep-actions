@@ -56,11 +56,11 @@ runs:
 
           name=$(echo "${{ github.event.repository.name }}" | tr '[:upper:]' '[:lower:]')
 
-          if [ -x "$(command -v mold)" ]; then
-            rm /usr/bin/ld
-            ln -s /usr/bin/mold /usr/bin/ld
-            echo "Using the mold linker"
-          fi
+          # if [ -x "$(command -v mold)" ]; then
+          #   rm /usr/bin/ld
+          #   ln -s /usr/bin/mold /usr/bin/ld
+          #   echo "Using the mold linker"
+          # fi
           if [[ "${{ inputs.stack }}" =~ cvmfs ]]; then
             source ${{ inputs.stack }}
           elif [ "${{ inputs.build_type }}" = "release" ]; then
@@ -90,13 +90,13 @@ runs:
             exit 1
           fi
 
-          mimalloc=$(echo $(dirname $(dirname $(dirname $(dirname $(which mold)))))/mimalloc/*/lib*/libmimalloc.so)
-          if [ -f "$mimalloc" ]; then
-            export LD_PRELOAD=$mimalloc
-            echo "Using mimalloc: $mimalloc"
-          else
-            echo "mimalloc not found, using default allocator"
-          fi
+          # mimalloc=$(echo $(dirname $(dirname $(dirname $(dirname $(which mold)))))/mimalloc/*/lib*/libmimalloc.so)
+          # if [ -f "$mimalloc" ]; then
+          #   export LD_PRELOAD=$mimalloc
+          #   echo "Using mimalloc: $mimalloc"
+          # else
+          #   echo "mimalloc not found, using default allocator"
+          # fi
 
           cd /${name}
           # There is no k4_local_repo in the LCG stacks
