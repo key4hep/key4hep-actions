@@ -91,7 +91,14 @@ runs:
             cd $package
             mkdir build
             cd build
-            cmake .. -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_CXX_STANDARD=20 -G Ninja
+
+            # Set cmake flags for downstream packages
+            cmake_extra_flags=""
+            if [[ "$package" == *"dd4hep"* ]]; then
+                cmake_extra_flags="$cmake_extra_flags -DDD4HEP_USE_GEANT4=ON -DDD4HEP_USE_XERCESC=ON -DDD4HEP_USE_LCIO=ON -DDD4HEP_USE_EDM4HEP=ON -DDD4HEP_BUILD_EXAMPLES=ON -DDD4HEP_BUILD_PACKAGES=\"DDG4 DDCond DDCAD DDRec DDDetectors DDAlign DDDigi DDEve UtilityApps\""
+            fi
+
+            cmake .. $cmake_extra_flags -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_CXX_STANDARD=20 -G Ninja 
             ninja && ninja install > /dev/null
             build_ret=$?
             if [ $build_ret -eq 0 ]; then
