@@ -155,7 +155,7 @@ runs:
 
     - name: Upload EDM4hep file
       if: github.repository == 'key4hep/EDM4hep'
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: EDM4hep example files (TTree and RNTuple)
         path: |
@@ -166,7 +166,7 @@ runs:
 
     - name: Upload CLDConfig file
       if: github.repository == 'key4hep/CLDConfig'
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: AIDA ROOT File
         path: |
@@ -176,7 +176,7 @@ runs:
 
     - name: Upload FCC-config file
       if: github.repository == 'HEP-FCC/FCC-config'
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: ALLEGRO and IDEA sim-digi-reco files
         path: |
