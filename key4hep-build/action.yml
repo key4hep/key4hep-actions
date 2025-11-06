@@ -56,11 +56,12 @@ runs:
 
           name=$(echo "${{ github.event.repository.name }}" | tr '[:upper:]' '[:lower:]')
 
-          # if [ -x "$(command -v mold)" ]; then
-          #   rm /usr/bin/ld
-          #   ln -s /usr/bin/mold /usr/bin/ld
-          #   echo "Using the mold linker"
-          # fi
+          if [ -x "$(command -v mold)" ]; then
+            rm /usr/bin/ld
+            ln -s /usr/bin/mold /usr/bin/ld
+            echo "Using the mold linker"
+          fi
+
           if [[ "${{ inputs.stack }}" =~ cvmfs ]]; then
             source ${{ inputs.stack }}
           elif [ "${{ inputs.build_type }}" = "release" ]; then
@@ -90,13 +91,13 @@ runs:
             exit 1
           fi
 
-          # mimalloc=$(echo $(dirname $(dirname $(dirname $(dirname $(which mold)))))/mimalloc/*/lib*/libmimalloc.so)
-          # if [ -f "$mimalloc" ]; then
-          #   export LD_PRELOAD=$mimalloc
-          #   echo "Using mimalloc: $mimalloc"
-          # else
-          #   echo "mimalloc not found, using default allocator"
-          # fi
+          mimalloc=$(echo $(dirname $(dirname $(dirname $(dirname $(which mold)))))/mimalloc/*/lib*/libmimalloc.so)
+          if [ -f "$mimalloc" ]; then
+            export LD_PRELOAD=$mimalloc
+            echo "Using mimalloc: $mimalloc"
+          else
+            echo "mimalloc not found, using default allocator"
+          fi
 
           cd /${name}
           # There is no k4_local_repo in the LCG stacks
@@ -111,13 +112,6 @@ runs:
             echo "----------------------------------"
             source /${name}/.github/workflows/.key4hep-build-env
           fi
-
-          export PATH=$(echo $PATH | tr ':' '\n' | grep -v "/$name/" | tr '\n' ':')
-          export LD_LIBRARY_PATH=$(echo $LD_LIBRARY_PATH | tr ':' '\n' | grep -v "/$name/" | tr '\n' ':')
-          export ROOT_LIBRARY_PATH=$(echo $ROOT_LIBRARY_PATH | tr ':' '\n' | grep -v "/$name/" | tr '\n' ':')
-          export ROOT_INCLUDE_PATH=$(echo $ROOT_INCLUDE_PATH | tr ':' '\n' | grep -v "/$name/" | tr '\n' ':')
-          export CPATH=$(echo $CPATH | tr ':' '\n' | grep -v "/$name/" | tr '\n' ':')
-          export PYTHONPATH=$(echo $PYTHONPATH | tr ':' '\n' | grep -v "/$name/" | tr '\n' ':')
 
           set -x
           cmake .. \
