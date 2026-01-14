@@ -11,7 +11,7 @@ inputs:
   stack:
     description: key4hep or devkey or full path to the setup script
     required: false
-    default: key4hep
+    default: devkey
 
 runs:
   using: "composite"
@@ -65,33 +65,42 @@ runs:
           if [[ "${{ inputs.stack }}" =~ cvmfs ]]; then
             source ${{ inputs.stack }}
           elif [ "${{ inputs.build_type }}" = "release" ]; then
-            if [ "${{ inputs.stack }}" = "key4hep" ]; then
-              source /cvmfs/sw.hsf.org/key4hep/setup.sh
-            elif [ "${{ inputs.stack }}" = "devkey" ]; then
-              source /cvmfs/sft.cern.ch/lcg/views/devkey/latest/x86_64-el9-gcc14-opt/setup.sh
-            else
-              echo "Unknown stack ${{ inputs.stack }}"
-              exit 1
-            fi
+            source /cvmfs/sw.hsf.org/key4hep/setup.sh
+            # if [ "${{ inputs.stack }}" = "key4hep" ]; then 
+            #   source /cvmfs/sw.hsf.org/key4hep/setup.sh
+            # elif [ "${{ inputs.stack }}" = "devkey" ]; then
+            #   source /cvmfs/sft.cern.ch/lcg/views/devkey/latest/x86_64-el9-gcc14-opt/setup.sh
+            # else
+            #   echo "Unknown stack ${{ inputs.stack }}"
+            #   exit 1
+            # fi
           elif [ "${{ inputs.build_type }}" = "nightly" ]; then
-            if [ "${{ inputs.stack }}" = "key4hep" ]; then
-              command="source /cvmfs/sw-nightlies.hsf.org/key4hep/setup.sh"
-              if [ "${{ inputs.compiler }}" = "gcc11" ]; then
-                command="$command -c gcc11"
-              fi
-              eval $command
-            elif [ "${{ inputs.stack }}" = "devkey" ]; then
-              source /cvmfs/sft-nightlies.cern.ch/lcg/views/devkey-head/latest/x86_64-el9-gcc14-opt/setup.sh
+            if [ "${{ inputs.image }}" = "ubuntu24" ]; then
+              source /cvmfs/sw-nightlies.hsf.org/key4hep/setup.sh
             else
-              echo "Unknown stack ${{ inputs.stack }}"
-              exit 1
+              source /cvmfs/sft-nightlies.cern.ch/lcg/views/devkey-head/latest/x86_64-el9-gcc14-opt/setup.sh
             fi
           else
             echo "Unknown build type"
             exit 1
           fi
 
-          mimalloc=$(echo $(dirname $(dirname $(dirname $(dirname $(which mold)))))/mimalloc/*/lib*/libmimalloc.so)
+          if [ "$KEY4HEP_STACK" == *"hsf.org"* ]; then
+            if command -v mold &>/dev/null; then
+              mimalloc=$(echo $(dirname $(dirname $(dirname $(dirname $(which mold)))))/mimalloc/*/lib*/libmimalloc.so)
+            fi
+          else
+            mimalloc_found=""
+            IFS=: read -ra dirs <<< "$LD_LIBRARY_PATH"
+            for dir in "${dirs[@]}"; do
+              candidate="$dir/libmimalloc.so"
+              if [ -f "$candidate" ]; then
+                mimalloc_found="$candidate"
+                break
+              fi
+            done
+            mimalloc="$mimalloc_found"
+          fi
           if [ -f "$mimalloc" ]; then
             export LD_PRELOAD=$mimalloc
             echo "Using mimalloc: $mimalloc"
@@ -100,8 +109,11 @@ runs:
           fi
 
           cd /${name}
+
           # There is no k4_local_repo in the LCG stacks
-          k4_local_repo || true
+          if [ -x "$(command -v k4_local_repo)" ]; then
+            k4_local_repo
+          fi
           mkdir -p build
           cd build
 
