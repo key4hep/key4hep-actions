@@ -88,8 +88,21 @@ runs:
             exit 1
           fi
 
-          if [ -x "$(command -v mold)" ]; then
-            mimalloc=$(echo $(dirname $(dirname $(dirname $(dirname $(which mold)))))/mimalloc/*/lib*/libmimalloc.so)
+          if [ "$KEY4HEP_STACK" == *"hsf.org"* ]; then
+            if command -v mold &>/dev/null; then
+              mimalloc=$(echo $(dirname $(dirname $(dirname $(dirname $(which mold)))))/mimalloc/*/lib*/libmimalloc.so)
+            fi
+          else
+            mimalloc_found=""
+            IFS=: read -ra dirs <<< "$LD_LIBRARY_PATH"
+            for dir in "${dirs[@]}"; do
+              candidate="$dir/libmimalloc.so"
+              if [ -f "$candidate" ]; then
+                mimalloc_found="$candidate"
+                break
+              fi
+            done
+            mimalloc="$mimalloc_found"
           fi
           if [ -f "$mimalloc" ]; then
             export LD_PRELOAD=$mimalloc
