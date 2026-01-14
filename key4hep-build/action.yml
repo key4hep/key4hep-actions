@@ -11,7 +11,7 @@ inputs:
   stack:
     description: key4hep or devkey or full path to the setup script
     required: false
-    default: key4hep
+    default: devkey
 
 runs:
   using: "composite"
@@ -65,21 +65,18 @@ runs:
           if [[ "${{ inputs.stack }}" =~ cvmfs ]]; then
             source ${{ inputs.stack }}
           elif [ "${{ inputs.build_type }}" = "release" ]; then
-            if [ "${{ inputs.stack }}" = "key4hep" ]; then
-              source /cvmfs/sw.hsf.org/key4hep/setup.sh
-            elif [ "${{ inputs.stack }}" = "devkey" ]; then
-              source /cvmfs/sft.cern.ch/lcg/views/devkey/latest/x86_64-el9-gcc14-opt/setup.sh
-            else
-              echo "Unknown stack ${{ inputs.stack }}"
-              exit 1
-            fi
+            # source /cvmfs/sw.hsf.org/key4hep/setup.sh
+            # if [ "${{ inputs.stack }}" = "key4hep" ]; then 
+            #   source /cvmfs/sw.hsf.org/key4hep/setup.sh
+            # elif [ "${{ inputs.stack }}" = "devkey" ]; then
+            #   source /cvmfs/sft.cern.ch/lcg/views/devkey/latest/x86_64-el9-gcc14-opt/setup.sh
+            # else
+            #   echo "Unknown stack ${{ inputs.stack }}"
+            #   exit 1
+            # fi
           elif [ "${{ inputs.build_type }}" = "nightly" ]; then
-            if [ "${{ inputs.stack }}" = "key4hep" ]; then
+            if [ "${{ inputs.stack }}" = "key4hep" || "${{ inputs.image }}" = "ubuntu24" ]; then
               command="source /cvmfs/sw-nightlies.hsf.org/key4hep/setup.sh"
-              if [ "${{ inputs.compiler }}" = "gcc11" ]; then
-                command="$command -c gcc11"
-              fi
-              eval $command
             elif [ "${{ inputs.stack }}" = "devkey" ]; then
               source /cvmfs/sft-nightlies.cern.ch/lcg/views/devkey-head/latest/x86_64-el9-gcc14-opt/setup.sh
             else
@@ -91,7 +88,9 @@ runs:
             exit 1
           fi
 
-          mimalloc=$(echo $(dirname $(dirname $(dirname $(dirname $(which mold)))))/mimalloc/*/lib*/libmimalloc.so)
+          if [ -x "$(command -v mold)" ]; then
+            mimalloc=$(echo $(dirname $(dirname $(dirname $(dirname $(which mold)))))/mimalloc/*/lib*/libmimalloc.so)
+          fi
           if [ -f "$mimalloc" ]; then
             export LD_PRELOAD=$mimalloc
             echo "Using mimalloc: $mimalloc"
