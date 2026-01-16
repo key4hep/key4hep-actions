@@ -85,7 +85,7 @@ runs:
             exit 1
           fi
 
-          if [ "$KEY4HEP_STACK" == *"hsf.org"* ]; then
+          if [[ "$KEY4HEP_STACK" == *"hsf.org"* ]]; then
             if command -v mold &>/dev/null; then
               mimalloc=$(echo $(dirname $(dirname $(dirname $(dirname $(which mold)))))/mimalloc/*/lib*/libmimalloc.so)
             fi
@@ -111,7 +111,7 @@ runs:
           cd /${name}
 
           # There is no k4_local_repo in the LCG stacks
-          if [ -x "$(command -v k4_local_repo)" ]; then
+          if command -v k4_local_repo >/dev/null 2>&1; then
             k4_local_repo
           fi
           mkdir -p build
@@ -140,7 +140,7 @@ runs:
 
           # For LCG stacks there is nothing pointing to the new environment
           # so we have to make sure that the new files are picked
-          if [ "${{ inputs.stack }}" = "devkey" ]; then
+          if [[ $KEY4HEP_STACK == *"devkey"* ]]; then
             export PATH=/${name}/install/bin:$PATH
             export LD_LIBRARY_PATH=/${name}/install/lib:${name}/install/lib64:$LD_LIBRARY_PATH
             export ROOT_INCLUDE_PATH=/${name}/install/include:$ROOT_INCLUDE_PATH
