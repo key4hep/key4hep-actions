@@ -1,5 +1,5 @@
 # key4hep-actions
-Github actions for CI in the key4hep stack
+G ithub actions for CI in the key4hep stack
 
 # Key4hep build
 This action builds the Key4hep stack on the supported OSes for both the stable
