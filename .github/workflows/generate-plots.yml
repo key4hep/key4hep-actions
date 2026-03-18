@@ -1,0 +1,30 @@
+name: PR Plot Validation
+on:
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  histcmp_test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    # Replace this step with your actual commands
+    - name: Generate plots (example)
+      run: |
+        mkdir -p html plots
+        cp pr-plot-validation/example/CLD_o2_v07-lambda.png plots/
+        cp pr-plot-validation/example/histcmp-results.html html/histcmp-results.html
+
+    - name: Upload plots and results
+      uses: actions/upload-artifact@v4
+      if: always()  # Upload even if tests fail
+      with:
+        name: histcmp-results
+        path: |
+          html/
+          plots/
