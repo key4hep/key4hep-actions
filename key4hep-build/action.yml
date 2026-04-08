@@ -66,14 +66,6 @@ runs:
             source ${{ inputs.stack }}
           elif [ "${{ inputs.build_type }}" = "release" ]; then
             source /cvmfs/sw.hsf.org/key4hep/setup.sh
-            # if [ "${{ inputs.stack }}" = "key4hep" ]; then 
-            #   source /cvmfs/sw.hsf.org/key4hep/setup.sh
-            # elif [ "${{ inputs.stack }}" = "devkey" ]; then
-            #   source /cvmfs/sft.cern.ch/lcg/views/devkey/latest/x86_64-el9-gcc14-opt/setup.sh
-            # else
-            #   echo "Unknown stack ${{ inputs.stack }}"
-            #   exit 1
-            # fi
           elif [ "${{ inputs.build_type }}" = "nightly" ]; then
             if [ "${{ inputs.image }}" = "ubuntu24" ]; then
               source /cvmfs/sw-nightlies.hsf.org/key4hep/setup.sh
@@ -118,7 +110,7 @@ runs:
           cd build
 
           if [ -f /${name}/.github/workflows/.key4hep-build-env ]; then
-            echo "Sourcing .keyhep-build-env"
+            echo "Sourcing .key4hep-build-env"
             echo "----------------------------------"
             cat /${name}/.github/workflows/.key4hep-build-env
             echo "----------------------------------"
@@ -142,20 +134,16 @@ runs:
           # so we have to make sure that the new files are picked
           if [[ $KEY4HEP_STACK == *"devkey"* ]]; then
             export PATH=/${name}/install/bin:$PATH
-            export LD_LIBRARY_PATH=/${name}/install/lib:${name}/install/lib64:$LD_LIBRARY_PATH
+            export LD_LIBRARY_PATH=/${name}/install/lib:/${name}/install/lib64:$LD_LIBRARY_PATH
             export ROOT_INCLUDE_PATH=/${name}/install/include:$ROOT_INCLUDE_PATH
             export CPATH=/${name}/install/include:$CPATH
             export PYTHONPATH=/${name}/install/lib/python*/site-packages:/${name}/install/python:$PYTHONPATH
           fi
 
           ctest -j $(nproc) --output-on-failure
-
-
           EOF
 
           chmod +x ${GITHUB_WORKSPACE}/script_container.sh
-
-          # cat ${GITHUB_WORKSPACE}/script_container.sh
 
           docker exec container /bin/bash -c "/mount.sh && /${name}/script_container.sh"
 
@@ -190,4 +178,3 @@ runs:
           ${{ github.workspace }}/build/IDEA_sim_digi_reco.root
         retention-days: 7
         overwrite: true
-

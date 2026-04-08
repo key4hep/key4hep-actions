@@ -21,10 +21,7 @@ jobs:
           - build_type: nightly
             image: ubuntu24
       fail-fast: false
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ./key4hep-build
-        with:
-          build_type: ${{ matrix.build_type }}
-          image: ${{ matrix.image }}
+    uses: ./.github/workflows/key4hep-build.yml
+    with:
+      build_type: ${{ matrix.build_type }}
+      image: ${{ matrix.image }}
