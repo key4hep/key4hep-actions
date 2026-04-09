@@ -191,3 +191,13 @@ runs:
         retention-days: 7
         overwrite: true
 
+    - name: Upload k4Generators file
+      if: github.repository == 'key4hep/k4GeneratorsConfig'
+      uses: actions/upload-artifact@v7
+      with:
+        name: k4GeneratorsConfig_report_${{ matrix.build_type }}_${{ matrix.image }}
+        path: |
+          test/output/*
+        retention-days: 7
+        overwrite: true
+
