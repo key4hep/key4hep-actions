@@ -197,8 +197,8 @@ runs:
       with:
         name: k4GeneratorsConfig_report_${{ matrix.build_type }}_${{ matrix.image }}
         path: |
-          test/xsectionSummary.dat
-          test/output/*
+          test/Run-Cards/*.dat
+          test/Run-Cards/*.root
         retention-days: 7
         overwrite: true
 
