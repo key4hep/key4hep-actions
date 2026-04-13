@@ -191,8 +191,8 @@ runs:
         retention-days: 7
         overwrite: true
 
-    - name: Upload k4Generators file
-      if: github.repository == 'key4hep/k4GeneratorsConfig'
+    - name: Upload k4Generators files
+      if: ${{ !cancelled() && github.repository == 'key4hep/k4GeneratorsConfig' }}
       uses: actions/upload-artifact@v7
       with:
         name: k4GeneratorsConfig_report_${{ matrix.build_type }}_${{ matrix.image }}
@@ -201,4 +201,3 @@ runs:
           test/Run-Cards/*.root
         retention-days: 7
         overwrite: true
-
