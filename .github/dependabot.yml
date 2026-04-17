@@ -7,18 +7,11 @@ version: 2
 updates:
   # Keep dependencies for GitHub Actions up-to-date
   - package-ecosystem: 'github-actions'
-    directory: '/cache-external-data'
-    schedule:
-      interval: 'weekly'
-  - package-ecosystem: 'github-actions'
-    directory: '/downstream-build'
-    schedule:
-      interval: 'weekly'
-  - package-ecosystem: 'github-actions'
-    directory: '/key4hep-build'
-    schedule:
-      interval: 'weekly'
-  - package-ecosystem: 'github-actions'
-    directory: '/workflows'
+    directories:
+      - '/' # .github/workflows and .yml/.yaml files in the root directory
+      - '/cache-external-data'
+      - '/downstream-build'
+      - '/key4hep-build'
+      - '/workflows'
     schedule:
       interval: 'weekly'
