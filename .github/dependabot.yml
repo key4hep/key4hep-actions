@@ -9,9 +9,6 @@ updates:
   - package-ecosystem: 'github-actions'
     directories:
       - '/' # .github/workflows and .yml/.yaml files in the root directory
-      - '/cache-external-data'
-      - '/downstream-build'
-      - '/key4hep-build'
-      - '/workflows'
+      - '/*'
     schedule:
       interval: 'weekly'
