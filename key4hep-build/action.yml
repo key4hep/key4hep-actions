@@ -159,6 +159,18 @@ runs:
 
           docker exec container /bin/bash -c "/mount.sh && /${name}/script_container.sh"
 
+    - name: Upload CTest logs
+      if: ${{ !cancelled() }}
+      uses: actions/upload-artifact@v7
+      with:
+        name: CTest logs_${{ inputs.build_type }}_${{ inputs.image }}
+        path: |
+          ${{ github.workspace }}/build/Testing/Temporary
+          !${{ github.workspace }}/build/Testing/Temporary/CTestCostData.txt
+        if-no-files-found: warn
+        retention-days: 7
+        overwrite: true
+
     - name: Upload EDM4hep file
       if: github.repository == 'key4hep/EDM4hep'
       uses: actions/upload-artifact@v7
