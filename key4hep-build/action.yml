@@ -163,13 +163,12 @@ runs:
       if: ${{ !cancelled() }}
       uses: actions/upload-artifact@v7
       with:
-        name: CTest logs_${{ inputs.build_type }}_${{ inputs.image }}
+        name: CTest logs_${{ inputs.build_type }}_${{ inputs.image }}_run${{ github.run_id }}_attempt${{ github.run_attempt }}
         path: |
           ${{ github.workspace }}/build/Testing/Temporary
           !${{ github.workspace }}/build/Testing/Temporary/CTestCostData.txt
         if-no-files-found: warn
-        retention-days: 7
-        overwrite: true
+        retention-days: 3
 
     - name: Upload EDM4hep file
       if: github.repository == 'key4hep/EDM4hep'
