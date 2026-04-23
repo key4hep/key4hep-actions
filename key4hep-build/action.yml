@@ -148,7 +148,7 @@ runs:
             export PYTHONPATH=/${name}/install/lib/python*/site-packages:/${name}/install/python:$PYTHONPATH
           fi
 
-          ctest -j $(nproc) --output-on-failure
+          ctest --output-on-failure
 
 
           EOF
