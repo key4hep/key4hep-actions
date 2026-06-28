@@ -58,11 +58,11 @@ runs:
 
           name=$(echo "${{ github.event.repository.name }}" | tr '[:upper:]' '[:lower:]')
 
-          if [ -x "$(command -v mold)" ]; then
-            rm /usr/bin/ld
-            ln -s /usr/bin/mold /usr/bin/ld
-            echo "Using the mold linker"
-          fi
+          # if [ -x "$(command -v mold)" ]; then
+          #   rm /usr/bin/ld
+          #   ln -s /usr/bin/mold /usr/bin/ld
+          #   echo "Using the mold linker"
+          # fi
 
           if [[ "${{ inputs.stack }}" =~ cvmfs ]]; then
             source ${{ inputs.stack }}
