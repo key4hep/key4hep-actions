@@ -16,151 +16,108 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - shell: bash
+    - name: Set date for cache key
+      shell: bash
       run: echo "NOW=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
     - uses: actions/cache@v6
       with:
-        path: ~/.cache/ccache
+        path: /home/runner/.cache/ccache
         key: ${{ inputs.build_type }}-${{ inputs.image }}-${{ env.NOW }}
         restore-keys: |
           ${{ inputs.build_type }}-${{ inputs.image }}
 
-    - name: Start container
+    - name: Setup ccache
       shell: bash
       run: |
-        name=$(echo "${{ github.event.repository.name }}" | tr '[:upper:]' '[:lower:]')
-        if [ "${{ inputs.image }}" = "alma9" ]; then
-          docker run --name container --privileged -v ${GITHUB_WORKSPACE}:/${name} -v ~/.cache/ccache:/root/.cache/ccache -d ghcr.io/key4hep/key4hep-images/alma9-cvmfs tail -f /dev/null
-        elif [ "${{ inputs.image }}" = "ubuntu22" ]; then
-          docker run --name container --privileged -v ${GITHUB_WORKSPACE}:/${name} -v ~/.cache/ccache:/root/.cache/ccache -d ghcr.io/key4hep/key4hep-images/ubuntu22-cvmfs tail -f /dev/null
-        elif [ "${{ inputs.image }}" = "ubuntu24" ]; then
-          docker run --name container --privileged -v ${GITHUB_WORKSPACE}:/${name} -v ~/.cache/ccache:/root/.cache/ccache -d ghcr.io/key4hep/key4hep-images/ubuntu24-cvmfs tail -f /dev/null
-        elif [ "${{ inputs.image }}" = "ubuntu26" ]; then
-          docker run --name container --privileged -v ${GITHUB_WORKSPACE}:/${name} -v ~/.cache/ccache:/root/.cache/ccache -d ghcr.io/key4hep/key4hep-images/ubuntu26-cvmfs tail -f /dev/null
+        set -e
+        export CCACHE_DIR=/root/.cache/ccache
+        export CCACHE_SLOPPINESS=include_file_ctime,include_file_mtime
+        ccache --set-config=max_size=500M
+        ccache -z
+
+    - name: Setup the Key4hep stack
+      shell: bash
+      run: |
+        set -e
+        if [[ "${{ inputs.stack }}" =~ cvmfs ]]; then
+          source ${{ inputs.stack }}
+        elif [ "${{ inputs.build_type }}" = "release" ]; then
+          source /cvmfs/sw.hsf.org/key4hep/setup.sh
+        elif [ "${{ inputs.build_type }}" = "nightly" ]; then
+          if [[ "${{ inputs.image }}" == *ubuntu* ]]; then
+            source /cvmfs/sw-nightlies.hsf.org/key4hep/setup.sh
+          else
+            source /cvmfs/sft-nightlies.cern.ch/lcg/views/devkey-head/latest/x86_64-el9-gcc14-opt/setup.sh
+          fi
         else
-          echo "Unknown image"
+          echo "Unknown build type"
           exit 1
         fi
+        declare -p | grep -Ev 'BASHOPTS|BASH_VERSINFO|EUID|PPID|SHELLOPTS|UID' > /env.sh
+        echo cd $GITHUB_WORKSPACE >> /env.sh
 
-    - name: Setup environment and build
+    - name: Pre-build setup
       shell: bash
       run: |
-          name=$(echo "${{ github.event.repository.name }}" | tr '[:upper:]' '[:lower:]')
+        set -e
+        source /env.sh
+        if command -v k4_local_repo >/dev/null 2>&1; then
+          k4_local_repo
+        fi
+        mkdir -p build
+        if [ -f .github/workflows/.key4hep-build-env ]; then
+          echo 'Sourcing .key4hep-build-env'
+          echo '----------------------------------'
+          cat .github/workflows/.key4hep-build-env
+          echo '----------------------------------'
+          source .github/workflows/.key4hep-build-env
+        fi
+        declare -p | grep -Ev 'BASHOPTS|BASH_VERSINFO|EUID|PPID|SHELLOPTS|UID' > /env.sh
+        echo cd $GITHUB_WORKSPACE/build >> /env.sh
 
-          cat <<'EOF' > ${GITHUB_WORKSPACE}/script_container.sh
-          set -e
+    - name: CMake configure
+      shell: bash
+      run: |
+        if [[ "${{ inputs.image }}" == "ubuntu26" ]]; then
+          CXX_STANDARD="23"
+        else
+          CXX_STANDARD="20"
+        fi
+        set -e
+        source /env.sh
+        set -x
+        cmake .. \
+          -DCMAKE_CXX_STANDARD=${CXX_STANDARD} \
+          -DCMAKE_INSTALL_PREFIX=../install \
+          -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+          -DCMAKE_CXX_FLAGS="-Werror -Wno-error=cpp -Wno-error=deprecated-declarations" \
+          -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+          -G Ninja \
+          ${K4_CMAKE_EXTRA_ARGS}
+        set +x
 
-          export CCACHE_DIR=/root/.cache/ccache
-          export CCACHE_SLOPPINESS=include_file_ctime,include_file_mtime
-          ccache --set-config=max_size=500M
-          ccache -z
+    - name: Build
+      shell: bash
+      run: |
+        set -e
+        source /env.sh
+        time ninja -k0 install
+        ccache -s
 
-          name=$(echo "${{ github.event.repository.name }}" | tr '[:upper:]' '[:lower:]')
-
-          if [ -x "$(command -v mold)" ]; then
-            rm /usr/bin/ld
-            ln -s /usr/bin/mold /usr/bin/ld
-            echo "Using the mold linker"
-          fi
-
-          if [[ "${{ inputs.stack }}" =~ cvmfs ]]; then
-            source ${{ inputs.stack }}
-          elif [ "${{ inputs.build_type }}" = "release" ]; then
-            source /cvmfs/sw.hsf.org/key4hep/setup.sh
-            # if [ "${{ inputs.stack }}" = "key4hep" ]; then 
-            #   source /cvmfs/sw.hsf.org/key4hep/setup.sh
-            # elif [ "${{ inputs.stack }}" = "devkey" ]; then
-            #   source /cvmfs/sft.cern.ch/lcg/views/devkey/latest/x86_64-el9-gcc14-opt/setup.sh
-            # else
-            #   echo "Unknown stack ${{ inputs.stack }}"
-            #   exit 1
-            # fi
-          elif [ "${{ inputs.build_type }}" = "nightly" ]; then
-            # if [ "${{ inputs.image }}" = "ubuntu24" ]; then
-            if [[ "${{ inputs.image }}" == *"ubuntu"* ]]; then
-              source /cvmfs/sw-nightlies.hsf.org/key4hep/setup.sh
-            else
-              source /cvmfs/sft-nightlies.cern.ch/lcg/views/devkey-head/latest/x86_64-el9-gcc14-opt/setup.sh
-            fi
-          else
-            echo "Unknown build type"
-            exit 1
-          fi
-
-          if [[ "$KEY4HEP_STACK" == *"hsf.org"* ]]; then
-            if command -v mold &>/dev/null; then
-              mimalloc=$(echo $(dirname $(dirname $(dirname $(dirname $(which mold)))))/mimalloc/*/lib*/libmimalloc.so)
-            fi
-          else
-            mimalloc_found=""
-            IFS=: read -ra dirs <<< "$LD_LIBRARY_PATH"
-            for dir in "${dirs[@]}"; do
-              candidate="$dir/libmimalloc.so"
-              if [ -f "$candidate" ]; then
-                mimalloc_found="$candidate"
-                break
-              fi
-            done
-            mimalloc="$mimalloc_found"
-          fi
-          if [ -f "$mimalloc" ]; then
-            export LD_PRELOAD=$mimalloc
-            echo "Using mimalloc: $mimalloc"
-          else
-            echo "mimalloc not found, using default allocator"
-          fi
-
-          cd /${name}
-
-          # There is no k4_local_repo in the LCG stacks
-          if command -v k4_local_repo >/dev/null 2>&1; then
-            k4_local_repo
-          fi
-          mkdir -p build
-          cd build
-
-          if [ -f /${name}/.github/workflows/.key4hep-build-env ]; then
-            echo "Sourcing .keyhep-build-env"
-            echo "----------------------------------"
-            cat /${name}/.github/workflows/.key4hep-build-env
-            echo "----------------------------------"
-            source /${name}/.github/workflows/.key4hep-build-env
-          fi
-
-          set -x
-          cmake .. \
-            -DCMAKE_CXX_STANDARD=20 \
-            -DCMAKE_INSTALL_PREFIX=../install \
-            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
-            -DCMAKE_CXX_FLAGS="-Werror -Wno-error=cpp -Wno-error=deprecated-declarations" \
-            -G Ninja \
-            ${K4_CMAKE_EXTRA_ARGS}
-          set +x
-
-          time ninja -k0 install
-          ccache -s
-
-          # For LCG stacks there is nothing pointing to the new environment
-          # so we have to make sure that the new files are picked
-          if [[ $KEY4HEP_STACK == *"devkey"* ]]; then
-            export PATH=/${name}/install/bin:$PATH
-            export LD_LIBRARY_PATH=/${name}/install/lib:${name}/install/lib64:$LD_LIBRARY_PATH
-            export ROOT_INCLUDE_PATH=/${name}/install/include:$ROOT_INCLUDE_PATH
-            export CPATH=/${name}/install/include:$CPATH
-            export PYTHONPATH=/${name}/install/lib/python*/site-packages:/${name}/install/python:$PYTHONPATH
-          fi
-
-          ctest -j $(nproc) --output-on-failure
-
-
-          EOF
-
-          chmod +x ${GITHUB_WORKSPACE}/script_container.sh
-
-          # cat ${GITHUB_WORKSPACE}/script_container.sh
-
-          docker exec container /bin/bash -c "/mount.sh && /${name}/script_container.sh"
+    - name: Test
+      shell: bash
+      run: |
+        set -e
+        source /env.sh
+        if [[ $KEY4HEP_STACK == *"devkey"* ]]; then
+          export PATH=$GITHUB_WORKSPACE/install/bin:$PATH
+          export LD_LIBRARY_PATH=$GITHUB_WORKSPACE/install/lib:$GITHUB_WORKSPACE/install/lib64:$LD_LIBRARY_PATH
+          export ROOT_INCLUDE_PATH=$GITHUB_WORKSPACE/install/include:$ROOT_INCLUDE_PATH
+          export CPATH=$GITHUB_WORKSPACE/install/include:$CPATH
+          export PYTHONPATH=$GITHUB_WORKSPACE/install/lib/python*/site-packages:$GITHUB_WORKSPACE/install/python:$PYTHONPATH
+        fi
+        ctest -j $(nproc) --output-on-failure
 
     - name: Upload CTest logs
       if: ${{ !cancelled() }}
