@@ -40,6 +40,11 @@ runs:
       shell: bash
       run: |
         set -e
+        if [ -x "$(command -v mold)" ]; then
+          rm /usr/bin/ld
+          ln -s /usr/bin/mold /usr/bin/ld
+          echo "Using the mold linker"
+        fi
         if [[ "${{ inputs.stack }}" =~ cvmfs ]]; then
           source ${{ inputs.stack }}
         elif [ "${{ inputs.build_type }}" = "release" ]; then
@@ -53,6 +58,28 @@ runs:
         else
           echo "Unknown build type"
           exit 1
+        fi
+        if [[ "$KEY4HEP_STACK" == *"hsf.org"* ]]; then
+          if command -v mold &>/dev/null; then
+            mimalloc=$(echo $(dirname $(dirname $(dirname $(dirname $(which mold)))))/mimalloc/*/lib*/libmimalloc.so)
+          fi
+        else
+          mimalloc_found=""
+          IFS=: read -ra dirs <<< "$LD_LIBRARY_PATH"
+          for dir in "${dirs[@]}"; do
+            candidate="$dir/libmimalloc.so"
+            if [ -f "$candidate" ]; then
+              mimalloc_found="$candidate"
+              break
+            fi
+          done
+          mimalloc="$mimalloc_found"
+        fi
+        if [ -f "$mimalloc" ]; then
+          export LD_PRELOAD=$mimalloc
+          echo "Using mimalloc: $mimalloc"
+        else
+          echo "mimalloc not found, using default allocator"
         fi
         declare -p | grep -Ev 'BASHOPTS|BASH_VERSINFO|EUID|PPID|SHELLOPTS|UID' > /env.sh
         echo cd $GITHUB_WORKSPACE >> /env.sh
@@ -79,20 +106,14 @@ runs:
     - name: CMake configure
       shell: bash
       run: |
-        if [[ "${{ inputs.image }}" == "ubuntu26" ]]; then
-          CXX_STANDARD="23"
-        else
-          CXX_STANDARD="20"
-        fi
         set -e
         source /env.sh
         set -x
         cmake .. \
-          -DCMAKE_CXX_STANDARD=${CXX_STANDARD} \
+          -DCMAKE_CXX_STANDARD=20 \
           -DCMAKE_INSTALL_PREFIX=../install \
           -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
           -DCMAKE_CXX_FLAGS="-Werror -Wno-error=cpp -Wno-error=deprecated-declarations" \
-          -DCMAKE_BUILD_TYPE=RelWithDebInfo \
           -G Ninja \
           ${K4_CMAKE_EXTRA_ARGS}
         set +x
