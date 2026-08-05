@@ -108,9 +108,22 @@ runs:
       run: |
         set -e
         source /env.sh
+        # Use C++23 when the compiler in the stack is GCC 15 or newer,
+        # fall back to C++20 otherwise
+        if command -v g++ >/dev/null 2>&1; then
+          GCC_MAJOR=$(g++ -dumpversion | cut -d. -f1)
+          if [ "$GCC_MAJOR" -ge 15 ]; then
+            CXX_STANDARD="23"
+          else
+            CXX_STANDARD="20"
+          fi
+        else
+          CXX_STANDARD="20"
+        fi
+        echo "Using C++ standard ${CXX_STANDARD} (GCC major version: ${GCC_MAJOR:-unknown})"
         set -x
         cmake .. \
-          -DCMAKE_CXX_STANDARD=20 \
+          -DCMAKE_CXX_STANDARD=${CXX_STANDARD} \
           -DCMAKE_INSTALL_PREFIX=../install \
           -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
           -DCMAKE_CXX_FLAGS="-Werror -Wno-error=cpp -Wno-error=deprecated-declarations" \
