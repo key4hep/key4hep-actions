@@ -53,7 +53,7 @@ runs:
           if [[ "${{ inputs.image }}" == *ubuntu* ]]; then
             source /cvmfs/sw-nightlies.hsf.org/key4hep/setup.sh
           else
-            source /cvmfs/sft-nightlies.cern.ch/lcg/views/devkey-head/latest/x86_64-el9-gcc14-opt/setup.sh
+            source /cvmfs/sw-nightlies.hsf.org/key4hep/setup.sh --lcg
           fi
         else
           echo "Unknown build type"
