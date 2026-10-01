@@ -20,7 +20,7 @@ runs:
       shell: bash
       run: echo "NOW=$(date +'%Y-%m-%d')" >> $GITHUB_ENV
 
-    - uses: actions/cache@v6
+    - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: /home/runner/.cache/ccache
         key: ${{ inputs.build_type }}-${{ inputs.image }}-${{ env.NOW }}
@@ -151,7 +151,7 @@ runs:
 
     - name: Upload CTest logs
       if: ${{ !cancelled() }}
-      uses: actions/upload-artifact@v7
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
       with:
         name: CTest logs_${{ inputs.build_type }}_${{ inputs.image }}_run${{ github.run_id }}_attempt${{ github.run_attempt }}
         path: |
@@ -162,7 +162,7 @@ runs:
 
     - name: Upload EDM4hep file
       if: github.repository == 'key4hep/EDM4hep'
-      uses: actions/upload-artifact@v7
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
       with:
         name: EDM4hep example files (TTree and RNTuple)
         path: |
@@ -173,7 +173,7 @@ runs:
 
     - name: Upload CLDConfig file
       if: github.repository == 'key4hep/CLDConfig'
-      uses: actions/upload-artifact@v7
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
       with:
         name: AIDA ROOT File
         path: |
@@ -183,7 +183,7 @@ runs:
 
     - name: Upload FCC-config file
       if: github.repository == 'HEP-FCC/FCC-config'
-      uses: actions/upload-artifact@v7
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
       with:
         name: ALLEGRO and IDEA sim-digi-reco files
         path: |
@@ -194,7 +194,7 @@ runs:
 
     - name: Upload k4Generators files
       if: ${{ !cancelled() && github.repository == 'key4hep/k4GeneratorsConfig' }}
-      uses: actions/upload-artifact@v7
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
       with:
         name: k4GeneratorsConfig_report_${{ matrix.build_type }}_${{ matrix.image }}
         path: |
