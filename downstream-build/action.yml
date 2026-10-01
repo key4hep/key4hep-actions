@@ -6,7 +6,7 @@ runs:
     - name: Start container
       shell: bash
       run: |
-        docker run -it --name container --privileged -v ${GITHUB_WORKSPACE}:/Package/main -d ghcr.io/key4hep/key4hep-images/alma9-cvmfs /bin/bash
+        docker run -it --name container --privileged -v ${GITHUB_WORKSPACE}:/Package/${{ github.event.repository.name }} -d ghcr.io/key4hep/key4hep-images/alma9-cvmfs /bin/bash
 
     - shell: bash
       run: |
@@ -28,39 +28,11 @@ runs:
             exit 0
         fi
 
-        # Use C++23 when the compiler in the stack is GCC 15 or newer,
-        # fall back to C++20 otherwise
-        GCC_MAJOR=$(g++ -dumpversion | cut -d. -f1)
-        if [ "$GCC_MAJOR" -ge 15 ]; then
-            CXX_STANDARD="23"
-        else
-            CXX_STANDARD="20"
-        fi
-        echo "Using C++ standard ${CXX_STANDARD} (GCC major version: ${GCC_MAJOR})"
-
-        # With an LCG view all the packages are in the same prefix and it is not
-        # possible to remove them from the environment, so the installation
-        # directories of the packages built here are put in front of the view
-        add_to_environment() {
-            export PATH=$1/bin:$PATH
-            export ROOT_LIBRARY_PATH=$1/lib:$1/lib64:$ROOT_LIBRARY_PATH
-            export LD_LIBRARY_PATH=$1/lib:$1/lib64:$LD_LIBRARY_PATH
-            export ROOT_INCLUDE_PATH=$1/include:$ROOT_INCLUDE_PATH
-            export CPATH=$1/include:$CPATH
-            export PYTHONPATH=$1/python:$PYTHONPATH
-            for d in $1/lib/python*/site-packages $1/lib64/python*/site-packages; do
-                if [ -d "$d" ]; then
-                    export PYTHONPATH=$d:$PYTHONPATH
-                fi
-            done
-            export CMAKE_PREFIX_PATH=$1:$CMAKE_PREFIX_PATH
-        }
-
         status=0
-        cd /Package/main
+        cd /Package/${{ github.event.repository.name }}
         mkdir build
         cd build
-        cmake .. -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_CXX_STANDARD=${CXX_STANDARD} -DBUILD_TESTING=OFF -G Ninja
+        cmake .. -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_CXX_STANDARD=23 -DBUILD_TESTING=OFF -G Ninja
         ninja && ninja install > /dev/null
         build_ret=$?
         if [ $build_ret -ne 0 ]; then
@@ -68,22 +40,27 @@ runs:
         fi
         # Do not run the tests, this is already done in other CI workflows
         # ctest -j $(nproc) --output-on-failure
-        add_to_environment /Package/main/install
+        cd ..
+        k4_local_repo
 
         cd /Workarea
-        for package in $(ls)
+        # The clones are named NN_<name> so that sorting them gives the build order,
+        # but k4_local_repo needs each repository to be in a directory with its own name
+        for clone in $(ls)
         do
+            package=$(basename $(git -C $clone remote get-url origin) .git)
+            mv $clone $package
             cd $package
             mkdir build
             cd build
 
             # Set cmake flags for downstream packages
             cmake_extra_flags=""
-            if [[ "$package" == *"dd4hep"* ]]; then
+            if [[ "${package,,}" == *"dd4hep"* ]]; then
                 cmake_extra_flags="$cmake_extra_flags -DDD4HEP_USE_GEANT4=ON -DDD4HEP_USE_XERCESC=ON -DDD4HEP_USE_LCIO=ON -DDD4HEP_USE_EDM4HEP=ON -DDD4HEP_BUILD_EXAMPLES=ON -DDD4HEP_BUILD_PACKAGES=DDG4 DDCond DDCAD DDRec DDDetectors DDAlign DDDigi DDEve UtilityApps"
             fi
 
-            cmake .. $cmake_extra_flags -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_CXX_STANDARD=${CXX_STANDARD} -G Ninja
+            cmake .. $cmake_extra_flags -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_CXX_STANDARD=23 -G Ninja
             ninja && ninja install > /dev/null
             build_ret=$?
             if [ $build_ret -eq 0 ]; then
@@ -96,7 +73,8 @@ runs:
             if [ $build_ret -ne 0 ] || [ $test_ret -ne 0 ]; then
                 status=1
             fi
-            add_to_environment /Workarea/$package/install
+            cd ..
+            k4_local_repo
             cd /Workarea
         done
         exit $status
@@ -105,4 +83,4 @@ runs:
 
         cat ${GITHUB_WORKSPACE}/script_container.sh
 
-        docker exec container /bin/bash /Package/main/script_container.sh
+        docker exec container /bin/bash /Package/${{ github.event.repository.name }}/script_container.sh
