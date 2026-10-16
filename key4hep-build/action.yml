@@ -155,8 +155,8 @@ runs:
       with:
         name: CTest logs_${{ inputs.build_type }}_${{ inputs.image }}_run${{ github.run_id }}_attempt${{ github.run_attempt }}
         path: |
-          ${{ github.workspace }}/build/Testing/Temporary
-          !${{ github.workspace }}/build/Testing/Temporary/CTestCostData.txt
+          build/Testing/Temporary
+          !build/Testing/Temporary/CTestCostData.txt
         if-no-files-found: warn
         retention-days: 3
 
@@ -166,8 +166,8 @@ runs:
       with:
         name: EDM4hep example files (TTree and RNTuple)
         path: |
-          ${{ github.workspace }}/build/test/edm4hep_example.root
-          ${{ github.workspace }}/build/test/edm4hep_example_rntuple.root
+          build/test/edm4hep_example.root
+          build/test/edm4hep_example_rntuple.root
         retention-days: 7
         overwrite: true
 
@@ -187,8 +187,10 @@ runs:
       with:
         name: ALLEGRO and IDEA sim-digi-reco files
         path: |
-          ${{ github.workspace }}/build/ALLEGRO_sim_digi_reco.root
-          ${{ github.workspace }}/build/IDEA_sim_digi_reco.root
+          build/ALLEGRO_o1_v03_digi.root
+          build/ALLEGRO_o2_v01_digi.root
+          build/IDEA_o1_v03_digi.root
+          build/IDEA_o2_v01_digi_reco.root
         retention-days: 7
         overwrite: true
 
