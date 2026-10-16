@@ -187,8 +187,10 @@ runs:
       with:
         name: ALLEGRO and IDEA sim-digi-reco files
         path: |
-          build/ALLEGRO_sim_digi_reco.root
-          build/IDEA_sim_digi_reco.root
+          build/ALLEGRO_o1_v03_digi.root
+          build/ALLEGRO_o2_v01_digi.root
+          build/IDEA_o1_v03_digi.root
+          build/IDEA_o2_v01_digi_reco.root
         retention-days: 7
         overwrite: true
 
