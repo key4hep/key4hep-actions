@@ -155,8 +155,8 @@ runs:
       with:
         name: CTest logs_${{ inputs.build_type }}_${{ inputs.image }}_run${{ github.run_id }}_attempt${{ github.run_attempt }}
         path: |
-          ${{ github.workspace }}/build/Testing/Temporary
-          !${{ github.workspace }}/build/Testing/Temporary/CTestCostData.txt
+          build/Testing/Temporary
+          !build/Testing/Temporary/CTestCostData.txt
         if-no-files-found: warn
         retention-days: 3
 
@@ -187,8 +187,8 @@ runs:
       with:
         name: ALLEGRO and IDEA sim-digi-reco files
         path: |
-          ${{ github.workspace }}/build/ALLEGRO_sim_digi_reco.root
-          ${{ github.workspace }}/build/IDEA_sim_digi_reco.root
+          build/ALLEGRO_sim_digi_reco.root
+          build/IDEA_sim_digi_reco.root
         retention-days: 7
         overwrite: true
 
