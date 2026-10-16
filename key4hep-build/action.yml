@@ -166,8 +166,8 @@ runs:
       with:
         name: EDM4hep example files (TTree and RNTuple)
         path: |
-          ${{ github.workspace }}/build/test/edm4hep_example.root
-          ${{ github.workspace }}/build/test/edm4hep_example_rntuple.root
+          build/test/edm4hep_example.root
+          build/test/edm4hep_example_rntuple.root
         retention-days: 7
         overwrite: true
 
