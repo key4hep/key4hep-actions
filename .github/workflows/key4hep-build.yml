@@ -1,0 +1,32 @@
+name: Key4hep build
+
+on:
+  workflow_call:
+    inputs:
+      build_type:
+        description: release or nightly or other
+        required: true
+        type: string
+      image:
+        description: alma9, ubuntu22 or ubuntu24
+        required: true
+        type: string
+      stack:
+        description: key4hep or devkey or full path to the setup script
+        required: false
+        type: string
+        default: devkey
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/key4hep/key4hep-images/${{ inputs.image }}-cvmfs
+      options: --privileged
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./key4hep-build
+        with:
+          build_type: ${{ inputs.build_type }}
+          image: ${{ inputs.image }}
+          stack: ${{ inputs.stack }}
