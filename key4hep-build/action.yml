@@ -171,13 +171,14 @@ runs:
         retention-days: 7
         overwrite: true
 
-    - name: Upload CLDConfig file
+    - name: Upload CLDConfig files
       if: github.repository == 'key4hep/CLDConfig'
       uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
       with:
-        name: AIDA ROOT File
+        name: CLD ROOT files
         path: |
           ${{ github.workspace }}/CLDConfig/rec_test_edm4hep_aida.root
+          ${{ github.workspace }}/CLDConfig/rec_test_edm4hep_REC.edm4hep.root
         retention-days: 7
         overwrite: true
 
