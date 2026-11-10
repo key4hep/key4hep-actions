@@ -6,7 +6,7 @@ inputs:
     description: release or nightly or other
     required: true
   image:
-    description: alma9, ubuntu22, ubuntu24 or ubuntu26
+    description: alma9, alma10, ubuntu22, ubuntu24 or ubuntu26
     required: true
   stack:
     description: key4hep or devkey or full path to the setup script
