@@ -7,11 +7,13 @@ parameters
 
 - `build_type`: Which build are you targetting? Can either be `release`,
   `nightly` or `other`
-- `image`: Which (OS) image to use, can either be `alma9`, `ubuntu22` or
-  `ubuntu24`
+- `image`: Which (OS) image to use, can either be `alma9`, `alma10`, `ubuntu22`,
+  `ubuntu24` or `ubuntu26`
 
 Note that not all combinations of `build_type` and `image` might be available at
-any given point.
+any given point. The workflow template tests nightly builds on AlmaLinux 9
+(GCC 16), AlmaLinux 10 (GCC 16), and Ubuntu 26. AlmaLinux 10 uses an explicit LCG
+view setup script through the `stack` parameter.
 
 Additionally, there is an optional paramter:
 - `stack`: For switching between `key4hep` (default) and `devkey`. **This is a
