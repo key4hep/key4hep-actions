@@ -20,11 +20,13 @@ jobs:
   build:
     strategy:
       matrix:
-        build_type: ["nightly"]
-        image: ["alma9", "alma10", "ubuntu26"]
+        build_type: ["release", "nightly"]
+        image: ["alma9"]
         include:
-          - image: alma10
-            stack: /cvmfs/sft-nightlies.cern.ch/lcg/views/devkey-head/latest/x86_64-el10-gcc16-opt/setup.sh
+          - build_type: nightly
+            image: alma10
+          - build_type: nightly
+            image: ubuntu26
       fail-fast: false
     runs-on: ubuntu-latest
     container:
@@ -44,4 +46,3 @@ jobs:
       with:
         build_type: ${{ matrix.build_type }}
         image: ${{ matrix.image }}
-        stack: ${{ matrix.stack }}

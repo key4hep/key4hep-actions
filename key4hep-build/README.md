@@ -11,9 +11,9 @@ parameters
   `ubuntu24` or `ubuntu26`
 
 Note that not all combinations of `build_type` and `image` might be available at
-any given point. The workflow template tests nightly builds on AlmaLinux 9
-(GCC 16), AlmaLinux 10 (GCC 16), and Ubuntu 26. AlmaLinux 10 uses an explicit LCG
-view setup script through the `stack` parameter.
+any given point. The workflow template keeps release testing on AlmaLinux 9
+and tests nightly builds on AlmaLinux 9 (GCC 16), AlmaLinux 10 (GCC 16), and
+Ubuntu 26.
 
 Additionally, there is an optional paramter:
 - `stack`: For switching between `key4hep` (default) and `devkey`. **This is a
