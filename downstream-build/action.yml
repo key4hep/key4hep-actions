@@ -90,6 +90,7 @@ runs:
         for package in $(ls)
         do
             cd $package
+            echo $package "on branch: "$(git branch --show-current)" ("$(git rev-parse --short HEAD)")"
             mkdir build
             cd build
 
