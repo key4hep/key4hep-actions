@@ -6,7 +6,7 @@ runs:
     - name: Start container
       shell: bash
       run: |
-        docker run -it --name container --privileged -v ${GITHUB_WORKSPACE}:/Package/main -d ghcr.io/key4hep/key4hep-images/alma9-cvmfs /bin/bash
+        docker run -it --name container --privileged -v ${GITHUB_WORKSPACE}:/Package/${{ github.event.repository.name }} -d ghcr.io/key4hep/key4hep-images/alma9-cvmfs /bin/bash
 
     - shell: bash
       run: |
@@ -16,37 +16,11 @@ runs:
         cd ./Package
 
         source /cvmfs/sw-nightlies.hsf.org/key4hep/setup.sh
-        rel=$(find /cvmfs/sw-nightlies.hsf.org/key4hep/releases/ -maxdepth 3 -type f -wholename "*almalinux9*/.scratch" | sort -r | head -1)
-        rel=$(dirname $rel)
-        echo "rel is $rel"
-
-        git clone https://github.com/spack/spack --single-branch -q
-        cd spack
-        git checkout $(cat $rel/.spack-commit)
-        # This is not needed since very rarely a new dependency is in the cherry picks
-        # In addition the right commit for key4hep-spack should be used if this is
-        # to be sourced
-        # source $rel/.cherry-pick
-        cd ..
-
-        source spack/share/spack/setup-env.sh
-
-        git clone https://github.com/key4hep/key4hep-spack --single-branch -q
-        cd key4hep-spack
-        git checkout $(cat $rel/.key4hep-spack-commit)
-        spack env activate environments/key4hep-nightly-opt
-        cd ..
-
-        name=$(echo "${{ github.event.repository.name }}" | tr "[:upper:]" "[:lower:]")
-        echo $name
 
         git clone https://github.com/key4hep/key4hep-dev-utils --depth 1 -q
         mkdir /Workarea
         cd /Workarea
-        python3 /Package/key4hep-dev-utils/scripts/fetch_and_checkout.py $name
-
-        # Exit now if there is any command that fails
-        # set -e
+        python3 /Package/key4hep-dev-utils/scripts/fetch_and_checkout.py ${{ github.repository }} || exit 1
 
         # If there aren't any packages leave
         if [ -z "$(ls /Workarea)" ]; then
@@ -54,23 +28,11 @@ runs:
             exit 0
         fi
 
-        for package in $(ls)
-        do
-            paths="/${package:3}/|$paths"
-        done
-        paths="$paths/$name/"
-
-        for v in PATH LD_LIBRARY_PATH PYTHONPATH ROOT_INCLUDE_PATH CMAKE_PREFIX_PATH
-        do
-            export $v=$(eval echo \$$v | tr ":" "\n" | grep -Ev "${paths}" | tr "\n" ":")
-            # echo $v is ${!v}
-        done
-
         status=0
-        cd /Package/main
+        cd /Package/${{ github.event.repository.name }}
         mkdir build
         cd build
-        cmake .. -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_CXX_STANDARD=20 -DBUILD_TESTING=OFF -G Ninja
+        cmake .. -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_CXX_STANDARD=23 -DBUILD_TESTING=OFF -G Ninja
         ninja && ninja install > /dev/null
         build_ret=$?
         if [ $build_ret -ne 0 ]; then
@@ -78,28 +40,27 @@ runs:
         fi
         # Do not run the tests, this is already done in other CI workflows
         # ctest -j $(nproc) --output-on-failure
-        cd ../install
-        export PATH=$PWD/bin:$PATH
-        export ROOT_LIBRARY_PATH=$PWD/lib:$PWD/lib64:$ROOT_LIBRARY_PATH
-        export LD_LIBRARY_PATH=$PWD/lib:$PWD/lib64:$LD_LIBRARY_PATH
-        export ROOT_INCLUDE_PATH=$PWD/include:$ROOT_INCLUDE_PATH
-        export PYTHONPATH=$PWD/python:$PYTHONPATH
-        export CMAKE_PREFIX_PATH=$PWD:$CMAKE_PREFIX_PATH
+        cd ..
+        k4_local_repo
 
         cd /Workarea
-        for package in $(ls)
+        # The clones are named NN_<name> so that sorting them gives the build order,
+        # but k4_local_repo needs each repository to be in a directory with its own name
+        for clone in $(ls)
         do
+            package=$(basename $(git -C $clone remote get-url origin) .git)
+            mv $clone $package
             cd $package
             mkdir build
             cd build
 
             # Set cmake flags for downstream packages
             cmake_extra_flags=""
-            if [[ "$package" == *"dd4hep"* ]]; then
+            if [[ "${package,,}" == *"dd4hep"* ]]; then
                 cmake_extra_flags="$cmake_extra_flags -DDD4HEP_USE_GEANT4=ON -DDD4HEP_USE_XERCESC=ON -DDD4HEP_USE_LCIO=ON -DDD4HEP_USE_EDM4HEP=ON -DDD4HEP_BUILD_EXAMPLES=ON -DDD4HEP_BUILD_PACKAGES=DDG4 DDCond DDCAD DDRec DDDetectors DDAlign DDDigi DDEve UtilityApps"
             fi
 
-            cmake .. $cmake_extra_flags -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_CXX_STANDARD=20 -G Ninja 
+            cmake .. $cmake_extra_flags -DCMAKE_INSTALL_PREFIX=../install -DCMAKE_CXX_STANDARD=23 -G Ninja
             ninja && ninja install > /dev/null
             build_ret=$?
             if [ $build_ret -eq 0 ]; then
@@ -112,14 +73,9 @@ runs:
             if [ $build_ret -ne 0 ] || [ $test_ret -ne 0 ]; then
                 status=1
             fi
-            cd ../install
-            export PATH=$PWD/bin:$PATH
-            export ROOT_LIBRARY_PATH=$PWD/lib:$PWD/lib64:$ROOT_LIBRARY_PATH
-            export LD_LIBRARY_PATH=$PWD/lib:$PWD/lib64:$LD_LIBRARY_PATH
-            export ROOT_INCLUDE_PATH=$PWD/include:$ROOT_INCLUDE_PATH
-            export PYTHONPATH=$PWD/python:$PYTHONPATH
-            export CMAKE_PREFIX_PATH=$PWD:$CMAKE_PREFIX_PATH
-            cd ../..
+            cd ..
+            k4_local_repo
+            cd /Workarea
         done
         exit $status
 
@@ -127,4 +83,4 @@ runs:
 
         cat ${GITHUB_WORKSPACE}/script_container.sh
 
-        docker exec container /bin/bash /Package/main/script_container.sh
+        docker exec container /bin/bash /Package/${{ github.event.repository.name }}/script_container.sh
