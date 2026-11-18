@@ -51,6 +51,7 @@ runs:
             package=$(basename $(git -C $clone remote get-url origin) .git)
             mv $clone $package
             cd $package
+            echo $package "on branch: "$(git branch --show-current)" ("$(git rev-parse --short HEAD)")"
             mkdir build
             cd build
 
